@@ -3,10 +3,10 @@
 #define GENERAL_REG_NUM 31
 // This contains the types of registers
 typedef struct {
-    bool n;
-    bool z;
-    bool c;
-    bool v;
+    bool negativeFlag;
+    bool zeroFlag;
+    bool carryFlag;
+    bool overflowFlag;
 } pstate_t;
 
 extern uint64_t programCounter;

@@ -1,8 +1,7 @@
 #include <stdint.h>
+#include <stdio.h>
 #include "memory.h"
 #include "utils.h"
-
-//#include <stdio.h>
 
 // Here would be where the memory is, it is an array and we'll call it mem
 static uint8_t mem[MEM_SIZE];
@@ -15,6 +14,10 @@ void memoryInitialise(void) {
 }
 
 // This can read a value from memory
+uint8_t memoryRead8(int address) {
+    return mem[address];
+}
+
 uint32_t memoryRead32(int address) {
     uint32_t value = 0;
     for (int i = address; i < address + FOUR_BYTES; i++) {
@@ -34,6 +37,10 @@ uint64_t memoryRead64(int address) {
 }
 
 // This can write a value to memory
+void memoryWrite8(uint8_t value, int address) {
+    mem[address] = value;
+}
+
 void memoryWrite32(uint32_t value, int address) {
     // here we would put the value into little-endian mode (smallest byte to largest byte)
     for (int i = address; i < address + FOUR_BYTES; i++) {
@@ -48,17 +55,23 @@ void memoryWrite64(uint64_t value, int address) {
     }
 }
 
-//THIS IS A TEST TING, NOT SERIOUS AT ALL!!!
-//int main(void) {
-//    memoryInitialise();
-//   for (uint32_t j = 0; j < MEM_SIZE/4; j+=4) {
-//       memoryWrite32(j/4, j);
-//       printf("\nThe number we are representing is: %d\nThe 4 bytes of memory for this is:\n", j /4);
-//       printBits(mem[j], 8);
-//      printBits(mem[j+1], 8);
-//      printBits(mem[j+2], 8);
-//      printBits(mem[j+3], 8);
-//      printf("%d", memoryRead32(j));
-//   }
-//   return 0;
-//}
+void memoryPrintLoadedContents(char *filename) {
+    // store the file size
+    int size = sizeOfFile(filename);
+
+    printf("The size of this file is: %d bytes\n", size);
+
+        // printing out the contents of the memory
+        for (int address=0; address<size; address++) {
+            printf("The value of address: %x is :", address);
+            printf("%x\n", memoryRead8(address));
+        }
+
+        // prints out the words in memory location
+        for (int a=0; a<size; a+=4) {
+            printf("The word at address %x is: %x\n", a, memoryRead32(a));
+        }
+}
+
+// down here we will include printing the loaded contents of the memory later. Also we will tweak the way in which we print for 
+// it to go to an out file
