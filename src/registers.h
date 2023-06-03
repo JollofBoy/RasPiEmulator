@@ -9,8 +9,6 @@ typedef struct {
     bool overflowFlag;
 } pstate_t;
 
-extern uint64_t programCounter;
-
 // 64-bit manipulation
 extern uint64_t readXn(int);
 extern void writeXn(uint64_t, int);
@@ -21,3 +19,9 @@ extern void writeWn(uint32_t, int);
 
 // initialise function prototype
 extern void registerInitialise(void);
+
+// returns the program counter
+extern uint64_t getProgramCounter(void);
+
+// program counter is incremented by n
+extern void incrementProgramCounter(uint64_t);

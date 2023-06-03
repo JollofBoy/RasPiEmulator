@@ -1,12 +1,16 @@
+// standard headers
 #include <stdint.h>
 #include <stdbool.h>
+
+// made headers
 #include "registers.h"
+#include "utils.h"
 
 // creating the variables for the structures
 static uint64_t generalRegisters[GENERAL_REG_NUM];
 static pstate_t pstate;
 static uint64_t zeroRegister;
-uint64_t programCounter;
+static uint64_t programCounter;
 
 // 64-bit mode manipulations
 uint64_t readXn(int n) {
@@ -43,6 +47,16 @@ void registerInitialise(void) {
 // getting the value of the zeroRegister
 uint64_t getZeroRegister(void) {
     return zeroRegister;
+}
+
+// getting the value of the program counter
+uint64_t getProgramCounter(void) {
+   return programCounter; 
+}
+
+// increments the program counter by n
+void incrementProgramCounter(uint64_t n) {
+    programCounter += n;
 }
 
 // here we would edit the PSTATE in some way if needed

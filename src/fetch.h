@@ -1,2 +1,3 @@
-// This would contain relevant functions prototypes and whatnot for fetching
-int i4;
+#include <stdint.h>
+
+extern uint32_t fetchInstruction(void);

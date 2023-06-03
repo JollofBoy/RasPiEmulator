@@ -1,10 +1,13 @@
+// standard headers
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <stdbool.h>
+
+// made headers
 #include "emulate.h"
-#include "memory.h"
-#include "registers.h"
+#include "setup.h"
 #include "fetch.h"
 #include "decode.h"
 #include "execute.h"
@@ -16,41 +19,14 @@ int main(int argc, char **argv) {
         exit(1);
     }
 
-    // this initialises the registers and memory
-    memoryInitialise();
-    registerInitialise();
 
     // this loads the values from the binary file into memory
     load(argv[1]);
     
     // this is where the emulator while loop is held
     run();
+    // at this point the loop has ended so we output the contents of the register state
     return EXIT_SUCCESS;
-}
-
-void load(char *filename) {
-    // opening the file
-    FILE *fptr = fopen(filename, "rb");
-
-    if (fptr == NULL) {
-        fprintf(stderr, "File Err: can't open %s\n", filename);
-        exit(1);
-    }
-   
-    // loading the contents of the file into memory
-    unsigned int ch;
-    int j = 0;
-    while ((ch = getc(fptr)) != EOF) {
-        memoryWrite8(((char) ch) & 0xff, j);
-        j++;
-    }
-
-    // close the file
-    fclose(fptr);
-
-    // can optionally print out the contents of main memory
-    //memoryPrintLoadedContents(filename);
-    return;
 }
 
 void run(void) {
@@ -59,9 +35,7 @@ void run(void) {
     while (running) {
 
         // FETCH the instruction
-        uint32_t fetchedInstruction = memoryRead32(programCounter);
-        // the program counter increments here for now
-        programCounter += 1;
+        uint32_t fetchedInstruction = fetchInstruction();
 
         // DECODE the instruction
         // In it's corresponding file, we will have an instruction set of enumerated types so that we can correctly execute
@@ -69,8 +43,13 @@ void run(void) {
             running = false;
             break;
         }
+        
+        // here we will define an enum type for the group of instruction 
+        /*group_t decodedInstruction = decodeInstruction(fetchedInstruction);*/
 
         // EXECUTE the instruction
+        // this will take on the decoded enum for execution
+        executeInstruction(0 /*PLACEHOLDER FOR NOW*/);
     }
     return;
 }
