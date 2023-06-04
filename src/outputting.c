@@ -28,6 +28,12 @@ static void outputPSTATE(void) {
 }
 
 static void outputNonZeroMemory(void) {
+    printf("Non-zero memory:\n");
+    for (int address=0; address<MEM_SIZE; address+=4) {
+        if (memoryRead32(address) != 0) {
+            printf("0x%08x: 0x%08x\n", address, memoryRead32(address));
+        }
+    }
 }
 
 void output(void) {
