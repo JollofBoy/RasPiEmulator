@@ -24,7 +24,6 @@ int main(int argc, char **argv) {
         exit(1);
     }
 
-
     // this loads the values from the binary file into memory
     load(argv[1]);
     
@@ -44,11 +43,7 @@ void run(void) {
         // FETCH the instruction
         uint32_t fetchedInstruction = fetchInstruction();
         
-        // PRINTING THE FETCHED INSTRUCTION FOR TESTING
-        printf("the fetched instruction is: %x\n", fetchedInstruction);
-
-        // DECODE the instruction
-        // In it's corresponding file, we will have an instruction set of enumerated types so that we can correctly execute
+        // DECODE and EXECUTE the special instructions
         if (fetchedInstruction == HALT_INSTRUCTION) {
             running = false;
             break;
@@ -56,7 +51,7 @@ void run(void) {
             // EXECUTE the no operation instruction (-1 would mean to skip in the executeInstruction function)
             executeInstruction(-1);
         } else {
-            // this decodes a non-special instruction
+            // DECODES a non-special instruction
             group_t instructionGroup = decodeInstruction(fetchedInstruction);
 
             // EXECUTE the instruction
