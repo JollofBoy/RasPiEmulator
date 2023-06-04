@@ -15,6 +15,7 @@ static void outputGeneralRegisters(void) {
 }
 
 static void outputProgramCounter(void) {
+    printf("PC  = %016lx\n", getProgramCounter());
 }
 
 static void outputPSTATE(void) {
