@@ -13,6 +13,10 @@
 #include "execute.h"
 #include "utils.h"
 
+// private definitions
+#define HALT_INSTRUCTION 0x8a000000
+#define NO_OP_INSTRUCTION 0xd503201f
+
 int main(int argc, char **argv) {
     if (argc != 2) {
         fprintf(stderr, "Usage: input a binary file!\n");
@@ -42,10 +46,10 @@ void run(void) {
 
         // DECODE the instruction
         // In it's corresponding file, we will have an instruction set of enumerated types so that we can correctly execute
-        if (fetchedInstruction == 0x8a000000) {
+        if (fetchedInstruction == HALT_INSTRUCTION) {
             running = false;
             break;
-        } else if (fetchedInstruction == 0xd503201f) {
+        } else if (fetchedInstruction == NO_OP_INSTRUCTION) {
             // EXECUTE the no operation instruction (-1 would mean to skip in the executeInstruction function)
             executeInstruction(-1);
         } else {

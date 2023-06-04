@@ -1,6 +1,8 @@
 #include <stdbool.h>
 #include <stdint.h>
+
 #define GENERAL_REG_NUM 31
+
 // This contains the types of registers
 typedef struct {
     bool negativeFlag;

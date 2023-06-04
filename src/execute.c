@@ -2,32 +2,38 @@
 #include <stdio.h>
 
 // made headers
-#include "decode.h"
 #include "execute.h"
 #include "memory.h"
 #include "registers.h"
-
-// private functions
+#include "decode.h"
+#include "dataProcessingImmediate.h"
+#include "dataProcessingRegister.h"
+#include "loadAndStore.h"
+#include "branch.h"
 
 void executeInstruction(int instrGroup /* matches on the group of the instruction */) {
 
     // we are doing a switch case on the different types of instructions
     switch (instrGroup) {
         case DP_IMMEDIATE:
-            // call on executeDPI
+            // call on executeDPI (found in the corresponding file)
+            executeDPI();
             incrementProgramCounter(NEXT_INSTRUCTION);
             break;
         case DP_REGISTER:
-            // call on executeDPR
+            // call on executeDPR (found in the corresponding file)
+            executeDPR();
             incrementProgramCounter(NEXT_INSTRUCTION);
             break;
         case LOADS_AND_STORES:
-            // call on executeLAS
+            // call on executeLAS (found in the corresponding file)
+            executeLAS();
             incrementProgramCounter(NEXT_INSTRUCTION);
             break;
         case BRANCHES:
-            // call on executeB
-            // here we would increment the program counter accordingly
+            // call on executeB (found in the corresponding file)
+            // the program counter will be correctly incremented here
+            executeB();
             break;
         case -1:
             incrementProgramCounter(NEXT_INSTRUCTION);
