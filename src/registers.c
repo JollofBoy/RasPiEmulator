@@ -54,8 +54,8 @@ uint64_t getProgramCounter(void) {
    return programCounter; 
 }
 
-// increments the program counter by n
-void incrementProgramCounter(uint64_t n) {
+// increments the program counter by n bytes 
+void incrementProgramCounter(int n) {
     programCounter += n;
 }
 

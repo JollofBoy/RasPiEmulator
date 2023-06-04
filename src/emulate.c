@@ -36,6 +36,9 @@ void run(void) {
 
         // FETCH the instruction
         uint32_t fetchedInstruction = fetchInstruction();
+        
+        // PRINTING THE FETCHED INSTRUCTION FOR TESTING
+        printf("the fetched instruction is: %x\n", fetchedInstruction);
 
         // DECODE the instruction
         // In it's corresponding file, we will have an instruction set of enumerated types so that we can correctly execute
@@ -43,13 +46,10 @@ void run(void) {
             running = false;
             break;
         }
-        
-        // here we will define an enum type for the group of instruction 
-        /*group_t decodedInstruction = decodeInstruction(fetchedInstruction);*/
+        // this decodes a non-special instruction
+        group_t instructionGroup = decodeInstruction(fetchedInstruction);
 
         // EXECUTE the instruction
-        // this will take on the decoded enum for execution
-        executeInstruction(0 /*PLACEHOLDER FOR NOW*/);
+        executeInstruction(instructionGroup);
     }
-    return;
 }

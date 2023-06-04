@@ -23,5 +23,5 @@ extern void registerInitialise(void);
 // returns the program counter
 extern uint64_t getProgramCounter(void);
 
-// program counter is incremented by n
-extern void incrementProgramCounter(uint64_t);
+// program counter is incremented by n bytes
+extern void incrementProgramCounter(int);
