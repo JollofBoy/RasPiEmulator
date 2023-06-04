@@ -8,6 +8,10 @@
 
 // private functions
 static void outputGeneralRegisters(void) {
+    printf("Registers:\n");
+    for (int i=0; i<GENERAL_REG_NUM; i++) {
+        printf("X%02d = %016lx\n", i, readXn(i)); 
+    }
 }
 
 static void outputProgramCounter(void) {
