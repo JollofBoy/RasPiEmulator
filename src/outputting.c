@@ -7,16 +7,19 @@
 #include "memory.h"
 #include "registers.h"
 
+// private file pointer
+FILE *fptr;
+
 // private functions
 static void outputGeneralRegisters(void) {
-    printf("Registers:\n");
+    fprintf(fptr, "Registers:\n");
     for (int i=0; i<GENERAL_REG_NUM; i++) {
-        printf("X%02d    = %016lx\n", i, readXn(i)); 
+        fprintf(fptr, "X%02d    = %016lx\n", i, readXn(i)); 
     }
 }
 
 static void outputProgramCounter(void) {
-    printf("PC     = %016lx\n", getProgramCounter());
+    fprintf(fptr, "PC     = %016lx\n", getProgramCounter());
 }
 
 static void outputPSTATE(void) {
@@ -24,21 +27,27 @@ static void outputPSTATE(void) {
     char z = getZ() ? 'Z' : '-' ;
     char c = getC() ? 'C' : '-' ;
     char v = getV() ? 'V' : '-' ;
-    printf("PSTATE : %c%c%c%c\n", n, z, c, v);
+    fprintf(fptr, "PSTATE : %c%c%c%c\n", n, z, c, v);
 }
 
 static void outputNonZeroMemory(void) {
-    printf("Non-zero memory:\n");
+    fprintf(fptr, "Non-zero memory:\n");
     for (int address=0; address<MEM_SIZE; address+=4) {
         if (memoryRead32(address) != 0) {
-            printf("0x%08x: 0x%08x\n", address, memoryRead32(address));
+            fprintf(fptr, "0x%08x: 0x%08x\n", address, memoryRead32(address));
         }
     }
 }
 
-void output(void) {
+void output(char *outputFile) {
+    // opens the file in write mode
+    fptr = fopen(outputFile, "w");
+
     outputGeneralRegisters();
     outputProgramCounter();
     outputPSTATE();
     outputNonZeroMemory();
+    
+    // closes the file
+    fclose(fptr);
 }

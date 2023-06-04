@@ -1,1 +1,1 @@
-extern void output(void);
+extern void output(char*);

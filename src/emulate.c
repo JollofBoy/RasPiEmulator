@@ -19,19 +19,28 @@
 #define NO_OP_INSTRUCTION 0xd503201f
 
 int main(int argc, char **argv) {
-    if (argc != 2) {
-        fprintf(stderr, "Usage: input a binary file!\n");
+  
+    // these are too many inputs or too little inputs
+    if (argc < 2) {
+        fprintf(stderr, "Usage: too little inputs. Give 2\n");
+        exit(1);
+    } else if (argc > 3) {
+        fprintf(stderr, "Usage: too many inputs. Give 2\n");
         exit(1);
     }
 
     // this loads the values from the binary file into memory
-    load(argv[1]);
+    char *binFile = argv[1];
+    load(binFile);
     
-    // this is where the emulator while loop is held
+    // this is where the emulator while loop is ran
     run();
 
-    // at this point the loop has ended so we output the contents of the register state
-    output();
+    // we output the relevant values to the output file that is parsed
+    if (argc == 3) {
+        char *outFile = argv[2];
+        output(outFile);
+    }
     return EXIT_SUCCESS;
 }
 
