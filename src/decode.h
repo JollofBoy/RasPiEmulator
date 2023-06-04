@@ -24,6 +24,7 @@ typedef struct {
     uint32_t I;
     uint32_t bit10;
     uint32_t imm12;
+    //TODO might create some more members to better represent the offset
 } offset_t;
 
 // making a struct which contains every possible memory layout, where operand, opr, and offset are their own structures as well
@@ -38,13 +39,14 @@ typedef struct {
     uint32_t rm;
     uint32_t rnInstruct;
     uint32_t bit31;
+    uint32_t U;
     uint32_t L;
     offset_t *offset;
     uint32_t xn;
     uint32_t rt;
     int32_t simm19;
     int32_t simm26;
-    uint32_t cond;
+    uint32_t cond; //TODO might make this an enum with the mnemonic and the equivalent code (makes things easier here I think)
     uint32_t bits30To31;
 } instruction_t;
 

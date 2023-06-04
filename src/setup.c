@@ -34,7 +34,7 @@ void load(char *filename) {
     fclose(fptr);
 
     // can optionally print out the contents of main memory
-    memoryPrintLoadedContents(filename);
+    //memoryPrintLoadedContents(filename);
     return;
 }
 
