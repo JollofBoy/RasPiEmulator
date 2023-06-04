@@ -11,6 +11,7 @@
 #include "fetch.h"
 #include "decode.h"
 #include "execute.h"
+#include "outputting.h"
 #include "utils.h"
 
 // private definitions
@@ -29,7 +30,9 @@ int main(int argc, char **argv) {
     
     // this is where the emulator while loop is held
     run();
+
     // at this point the loop has ended so we output the contents of the register state
+    output();
     return EXIT_SUCCESS;
 }
 
