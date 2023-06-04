@@ -9,8 +9,11 @@
 // private definitions
 #define OP0_SHIFT 25
 #define OP0_MASK 0x0000000f 
+#define TWO_BIT_MASK 0x3 
+#define FIVE_BIT_MASK 0x1f
 
 // definining private functions
+// DISCLAIMER: there are alot of magic numbers here and those will be sorted out in future improvements TODO
 
 // this creates a pointer to the instruction_t struct
 static instruction_t *makeInstructStruct(void) {
@@ -33,19 +36,30 @@ static instruction_t *makeInstructStruct(void) {
 }
 
 // these are static as no other file would need to load anything into memory directly
-static void loadDPI(uint32_t id) {
+static void loadDPI(uint32_t id, uint32_t instr) {
+    instructionPtr = makeInstructStruct();
+    
+    // here we are going to literally assign a value to every piece of info relevant
+    instructionPtr->sf = instr >> 31;
+    instructionPtr->opc = TWO_BIT_MASK & (instr >> 29);
+    instructionPtr->opi = 0x7 & (instr >> 23);
+    instructionPtr->rd = FIVE_BIT_MASK & instr;
+    instructionPtr->operand->sh = 0x1 & (instr >> 22);
+    instructionPtr->operand->imm12 = 0xfff & (instr >> 10);
+    instructionPtr->operand->rnOperand = FIVE_BIT_MASK & (instr >> 5);
+    instructionPtr->operand->hw = TWO_BIT_MASK & (instr >> 21);
+    instructionPtr->operand->imm16 = 0xffff & (instr >> 5);
+}
+
+static void loadDPR(uint32_t id, uint32_t instr) {
     instructionPtr = makeInstructStruct();
 }
 
-static void loadDPR(uint32_t id) {
+static void loadLAS(uint32_t id, uint32_t instr) {
     instructionPtr = makeInstructStruct();
 }
 
-static void loadLAS(uint32_t id) {
-    instructionPtr = makeInstructStruct();
-}
-
-static void loadB(uint32_t id) {
+static void loadB(uint32_t id, uint32_t instr) {
     instructionPtr = makeInstructStruct();
 }
 
@@ -66,13 +80,13 @@ group_t decodeInstruction(uint32_t instruction) {
         case 0x9:
             group = DP_IMMEDIATE;
             printf("DP IMMEDIATE\n");
-            loadDPI(op0); // this sets the structs to every possible value in the case of DP_IMMEDIATE
+            loadDPI(op0, instruction); // this sets the structs to every possible value in the case of DP_IMMEDIATE
             break;
         case 0x5:
         case 0xd:
             group = DP_REGISTER;
             printf("DP REGISTER\n");
-            loadDPR(op0); // this sets the structs to every possible value in the case of DP_IMMEDIATE
+            loadDPR(op0, instruction); // this sets the structs to every possible value in the case of DP_REGISTER
             break;
         case 0x4:
         case 0x6:
@@ -80,13 +94,13 @@ group_t decodeInstruction(uint32_t instruction) {
         case 0xe:
             group = LOADS_AND_STORES;
             printf("LOADS AND STORES\n");
-            loadLAS(op0); // this sets the structs to every possible value in the case of DP_IMMEDIATE
+            loadLAS(op0, instruction); // this sets the structs to every possible value in the case of LOADS_AND_STORES
             break;
         case 0xa:
         case 0xb:
             group = BRANCHES;
             printf("BRANCHES\n");
-            loadB(op0); // this sets the structs to every possible value in the case of DP_IMMEDIATE
+            loadB(op0, instruction); // this sets the structs to every possible value in the case of BRANCHES
             break;
         default:
             printf("NO MATCH. op0 = %x\n", op0);
