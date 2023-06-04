@@ -45,11 +45,15 @@ void run(void) {
         if (fetchedInstruction == 0x8a000000) {
             running = false;
             break;
-        }
-        // this decodes a non-special instruction
-        group_t instructionGroup = decodeInstruction(fetchedInstruction);
+        } else if (fetchedInstruction == 0xd503201f) {
+            // EXECUTE the no operation instruction (-1 would mean to skip in the executeInstruction function)
+            executeInstruction(-1);
+        } else {
+            // this decodes a non-special instruction
+            group_t instructionGroup = decodeInstruction(fetchedInstruction);
 
-        // EXECUTE the instruction
-        executeInstruction(instructionGroup);
+            // EXECUTE the instruction
+            executeInstruction(instructionGroup);
+        }
     }
 }

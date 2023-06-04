@@ -11,7 +11,15 @@
 #define OP0_MASK 0x0000000f 
 #define ONE_BIT_MASK 0x1
 #define TWO_BIT_MASK 0x3 
+#define THREE_BIT_MASK 0x7 
+#define FOUR_BIT_MASK 0xf
 #define FIVE_BIT_MASK 0x1f
+#define SIX_BIT_MASK 0x3f 
+#define NINE_BIT_MASK 0x1ff
+#define TWELVE_BIT_MASK 0xfff 
+#define SIXTEEN_BIT_MASK 0xffff
+#define NINETEEN_BIT_MASK 0x3ffff 
+#define TWENTYSIX_BIT_MASK 0x3ffffff
 
 // definining private functions
 // DISCLAIMER: there are alot of magic numbers here and those will be sorted out in future improvements TODO
@@ -44,14 +52,14 @@ static void loadDPI(uint32_t id, uint32_t instr) {
     // here we are going to literally assign a value to every piece of info relevant
     instructionPtr->sf = instr >> 31;
     instructionPtr->opc = TWO_BIT_MASK & (instr >> 29);
-    instructionPtr->opi = 0x7 & (instr >> 23);
+    instructionPtr->opi = THREE_BIT_MASK & (instr >> 23);
     instructionPtr->rd = FIVE_BIT_MASK & instr;
 
     instructionPtr->operand->sh = ONE_BIT_MASK & (instr >> 22);
-    instructionPtr->operand->imm12 = 0xfff & (instr >> 10);
+    instructionPtr->operand->imm12 = TWELVE_BIT_MASK & (instr >> 10);
     instructionPtr->operand->rnOperand = FIVE_BIT_MASK & (instr >> 5);
     instructionPtr->operand->hw = TWO_BIT_MASK & (instr >> 21);
-    instructionPtr->operand->imm16 = 0xffff & (instr >> 5);
+    instructionPtr->operand->imm16 = SIXTEEN_BIT_MASK & (instr >> 5);
 }
 
 static void loadDPR(uint32_t id, uint32_t instr) {
@@ -61,12 +69,12 @@ static void loadDPR(uint32_t id, uint32_t instr) {
     instructionPtr->sf = instr >> 31;
     instructionPtr->opc = TWO_BIT_MASK & (instr >> 29);
     instructionPtr->M = ONE_BIT_MASK & (instr >> 28);
-    instructionPtr->opr = 0xf & (instr >> 21);
+    instructionPtr->opr = FOUR_BIT_MASK & (instr >> 21);
     instructionPtr->rm = FIVE_BIT_MASK & (instr >> 16);
     instructionPtr->rnInstruct = FIVE_BIT_MASK & (instr >> 5);
     instructionPtr->rd = FIVE_BIT_MASK & instr;
 
-    instructionPtr->operand->imm6 = 0x3f & (instr >> 10);
+    instructionPtr->operand->imm6 = SIX_BIT_MASK & (instr >> 10);
     instructionPtr->operand->x = ONE_BIT_MASK & (instr >> 15);
     instructionPtr->operand->ra = FIVE_BIT_MASK & (instr >> 10);
 }
@@ -81,19 +89,24 @@ static void loadLAS(uint32_t id, uint32_t instr) {
     instructionPtr->L = ONE_BIT_MASK & (instr >> 22);
     instructionPtr->xn = FIVE_BIT_MASK & (instr >> 5);
     instructionPtr->rt = FIVE_BIT_MASK & instr;
-    instructionPtr->simm19 = 0x3ffff & (instr >> 5);
+    instructionPtr->simm19 = NINETEEN_BIT_MASK & (instr >> 5);
 
     instructionPtr->offset->bit21 = instr >> 21;
     instructionPtr->offset->xm = FIVE_BIT_MASK & (instr >> 16);
-    instructionPtr->offset->simm9 = 0x1ff & (instr >> 12);
+    instructionPtr->offset->simm9 = NINE_BIT_MASK & (instr >> 12);
     instructionPtr->offset->I = ONE_BIT_MASK & (instr >> 11);
-    instructionPtr->offset->imm12 = 0xfff & (instr >> 10);
+    instructionPtr->offset->imm12 = TWELVE_BIT_MASK & (instr >> 10);
 }
 
 static void loadB(uint32_t id, uint32_t instr) {
     // creates a new stack pointer
     instructionPtr = makeInstructStruct();
 
+    instructionPtr->bits30To31 = TWO_BIT_MASK & (instr >> 30);
+    instructionPtr->simm26 = TWENTYSIX_BIT_MASK & instr;
+    instructionPtr->xn = FIVE_BIT_MASK & (instr >> 5);
+    instructionPtr->simm19 = NINETEEN_BIT_MASK & (instr >> 5);
+    instructionPtr->cond = FOUR_BIT_MASK & instr;
 }
 
 // under here include a global variable pointer that will point to the instruction_t struct
