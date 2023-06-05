@@ -60,21 +60,21 @@ void incrementProgramCounter(int n) {
     programCounter += n;
 }
 
-// changes the boolean value of the flag
-void toggleN(void) {
-    pstate.negativeFlag = !(pstate.negativeFlag);
+// sets the boolean value of the flag
+void setN(bool value) {
+    pstate.negativeFlag = value;
 }
 
-void toggleZ(void) {
-    pstate.zeroFlag = !(pstate.zeroFlag);
+void setZ(bool value) {
+    pstate.zeroFlag = value;
 }
 
-void toggleC(void) {
-    pstate.carryFlag = !(pstate.carryFlag);
+void setC(bool value) {
+    pstate.carryFlag = value;
 }
 
-void toggleV(void) {
-    pstate.overflowFlag = !(pstate.overflowFlag);
+void setV(bool value) {
+    pstate.overflowFlag = value;
 }
 
 bool getN(void) {

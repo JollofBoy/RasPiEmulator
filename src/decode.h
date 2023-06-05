@@ -1,5 +1,24 @@
 #include <stdint.h>
 
+// definitions for known bit masks
+#define ONE_BIT_MASK 0x1
+#define TWO_BIT_MASK 0x3 
+#define THREE_BIT_MASK 0x7 
+#define FOUR_BIT_MASK 0xf
+#define FIVE_BIT_MASK 0x1f
+#define SIX_BIT_MASK 0x3f 
+#define NINE_BIT_MASK 0x1ff
+#define TWELVE_BIT_MASK 0xfff 
+#define SIXTEEN_BIT_MASK 0xffff
+#define NINETEEN_BIT_MASK 0x3ffff 
+#define TWENTYSIX_BIT_MASK 0x3ffffff
+
+// definitions of maximum and min values
+// it is the same as their mask values
+#define MAX32 0xffffffff
+#define MAX64 0xffffffffffffffff
+#define MIN 0x0
+
 // an enum marking each type of instruction for execute to use
 typedef enum {DP_IMMEDIATE, DP_REGISTER, LOADS_AND_STORES, BRANCHES} group_t;
 

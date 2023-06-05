@@ -12,17 +12,6 @@
 // private definitions
 #define OP0_SHIFT 25
 #define OP0_MASK 0x0000000f 
-#define ONE_BIT_MASK 0x1
-#define TWO_BIT_MASK 0x3 
-#define THREE_BIT_MASK 0x7 
-#define FOUR_BIT_MASK 0xf
-#define FIVE_BIT_MASK 0x1f
-#define SIX_BIT_MASK 0x3f 
-#define NINE_BIT_MASK 0x1ff
-#define TWELVE_BIT_MASK 0xfff 
-#define SIXTEEN_BIT_MASK 0xffff
-#define NINETEEN_BIT_MASK 0x3ffff 
-#define TWENTYSIX_BIT_MASK 0x3ffffff
 
 // definining private functions
 // DISCLAIMER: there are alot of magic numbers here and those will be sorted out in future improvements TODO
