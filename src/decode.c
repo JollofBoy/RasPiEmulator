@@ -6,6 +6,9 @@
 // made headers
 #include "decode.h"
 
+// macro for outputting the struct
+#define getName(var)  #var
+
 // private definitions
 #define OP0_SHIFT 25
 #define OP0_MASK 0x0000000f 
@@ -23,6 +26,9 @@
 
 // definining private functions
 // DISCLAIMER: there are alot of magic numbers here and those will be sorted out in future improvements TODO
+
+// under here include a global variable pointer that will point to the instruction_t struct
+instruction_t *instructionPtr;
 
 // this creates a pointer to the instruction_t struct
 static instruction_t *makeInstructStruct(void) {
@@ -109,9 +115,6 @@ static void loadB(uint32_t id, uint32_t instr) {
     instructionPtr->cond = FOUR_BIT_MASK & instr;
 }
 
-// under here include a global variable pointer that will point to the instruction_t struct
-instruction_t *instructionPtr;
-
 // this is the identifier value to see what group the instruction goes under
 static uint32_t op0; 
 
@@ -153,6 +156,43 @@ group_t decodeInstruction(uint32_t instruction) {
     }
 
     return group;
+}
+
+void printInstructStructContents(void) {
+    printf("%s = %x\n", getName(sf), instructionPtr->sf);
+    printf("%s = %x\n", getName(opc), instructionPtr->opc);
+    printf("%s = %x\n", getName(opi), instructionPtr->opi);
+    printf("%s = %x\n", getName(rd), instructionPtr->rd);
+    printf("%s = %x\n", getName(M), instructionPtr->M);
+    printf("%s = %x\n", getName(opr), instructionPtr->opr);
+    printf("%s = %x\n", getName(rm), instructionPtr->rm);
+    printf("%s = %x\n", getName(rnInstruct), instructionPtr->rnInstruct);
+    printf("%s = %x\n", getName(bit31), instructionPtr->bit31);
+    printf("%s = %x\n", getName(U), instructionPtr->U);
+    printf("%s = %x\n", getName(L), instructionPtr->L);
+    printf("%s = %x\n", getName(xn), instructionPtr->xn);
+    printf("%s = %x\n", getName(rt), instructionPtr->rt);
+    printf("%s = %x\n", getName(cond), instructionPtr->cond);
+    printf("%s = %x\n", getName(bits30To31), instructionPtr->bits30To31);
+
+    printf("%s = %x\n", getName(simm19), instructionPtr->simm19);
+    printf("%s = %x\n", getName(simm26), instructionPtr->simm26);
+
+    printf("Operand -> %s = %d\n", getName(sh), instructionPtr->operand->sh);
+    printf("Operand -> %s = %d\n", getName(imm12), instructionPtr->operand->imm12);
+    printf("Operand -> %s = %d\n", getName(rnOperand), instructionPtr->operand->rnOperand);
+    printf("Operand -> %s = %d\n", getName(hw), instructionPtr->operand->hw);
+    printf("Operand -> %s = %d\n", getName(imm16), instructionPtr->operand->imm16);
+    printf("Operand -> %s = %d\n", getName(imm6), instructionPtr->operand->imm6);
+    printf("Operand -> %s = %d\n", getName(x), instructionPtr->operand->x);
+    printf("Operand -> %s = %d\n", getName(ra), instructionPtr->operand->ra);
+    
+    printf("Offset -> %s = %d\n", getName(bit21), instructionPtr->offset->bit21);
+    printf("Offset -> %s = %d\n", getName(xm), instructionPtr->offset->xm);
+    printf("Offset -> %s = %d\n", getName(simm9), instructionPtr->offset->simm9);
+    printf("Offset -> %s = %d\n", getName(I), instructionPtr->offset->I);
+    printf("Offset -> %s = %d\n", getName(bit10), instructionPtr->offset->bit10);
+    printf("Offset -> %s = %d\n", getName(imm12), instructionPtr->offset->imm12);
 }
 
 void deleteInstructStruct(instruction_t *ptr) {

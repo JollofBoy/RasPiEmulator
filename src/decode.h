@@ -56,5 +56,8 @@ extern instruction_t *instructionPtr;
 // decodes an instruction and sets the structs to contain every possible marker for the given op0
 extern group_t decodeInstruction(uint32_t);
 
+extern void printInstructStructContents(void);
+
 // frees the pointer
-extern void deleteInstructStruct(instruction_t *ptr);
+extern void deleteInstructStruct(instruction_t*);
+

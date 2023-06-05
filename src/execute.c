@@ -13,6 +13,9 @@
 
 void executeInstruction(int instrGroup /* matches on the group of the instruction */) {
 
+    // prints out the contents of the instruction structure
+    printInstructStructContents();
+
     // we are doing a switch case on the different types of instructions
     switch (instrGroup) {
         case DP_IMMEDIATE:
