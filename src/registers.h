@@ -1,6 +1,10 @@
 #include <stdbool.h>
 #include <stdint.h>
+
 #define GENERAL_REG_NUM 31
+#define THIRTYTWO_BIT_MASK 0x00000000ffffffff
+#define SIXTYFOUR_BIT_MASK 0xffffffffffffffff
+
 // This contains the types of registers
 typedef struct {
     bool negativeFlag;
@@ -25,3 +29,15 @@ extern uint64_t getProgramCounter(void);
 
 // program counter is incremented by n bytes
 extern void incrementProgramCounter(int);
+
+// these set the flag value
+extern void setN(bool);
+extern void setZ(bool);
+extern void setC(bool);
+extern void setV(bool);
+
+// these return the value of their respective flag
+extern bool getN(void);
+extern bool getZ(void);
+extern bool getC(void);
+extern bool getV(void);

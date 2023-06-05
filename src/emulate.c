@@ -11,21 +11,36 @@
 #include "fetch.h"
 #include "decode.h"
 #include "execute.h"
+#include "outputting.h"
 #include "utils.h"
 
+// private definitions
+#define HALT_INSTRUCTION 0x8a000000
+#define NO_OP_INSTRUCTION 0xd503201f
+
 int main(int argc, char **argv) {
-    if (argc != 2) {
-        fprintf(stderr, "Usage: input a binary file!\n");
+  
+    // these are too many inputs or too little inputs
+    if (argc < 2) {
+        fprintf(stderr, "Usage: too little inputs. Give 2\n");
+        exit(1);
+    } else if (argc > 3) {
+        fprintf(stderr, "Usage: too many inputs. Give 2\n");
         exit(1);
     }
 
-
     // this loads the values from the binary file into memory
-    load(argv[1]);
+    char *binFile = argv[1];
+    load(binFile);
     
-    // this is where the emulator while loop is held
+    // this is where the emulator while loop is ran
     run();
-    // at this point the loop has ended so we output the contents of the register state
+
+    // we output the relevant values to the output file that is parsed
+    if (argc == 3) {
+        char *outFile = argv[2];
+        output(outFile);
+    }
     return EXIT_SUCCESS;
 }
 
@@ -37,19 +52,15 @@ void run(void) {
         // FETCH the instruction
         uint32_t fetchedInstruction = fetchInstruction();
         
-        // PRINTING THE FETCHED INSTRUCTION FOR TESTING
-        printf("the fetched instruction is: %x\n", fetchedInstruction);
-
-        // DECODE the instruction
-        // In it's corresponding file, we will have an instruction set of enumerated types so that we can correctly execute
-        if (fetchedInstruction == 0x8a000000) {
+        // DECODE and EXECUTE the special instructions
+        if (fetchedInstruction == HALT_INSTRUCTION) {
             running = false;
             break;
-        } else if (fetchedInstruction == 0xd503201f) {
+        } else if (fetchedInstruction == NO_OP_INSTRUCTION) {
             // EXECUTE the no operation instruction (-1 would mean to skip in the executeInstruction function)
             executeInstruction(-1);
         } else {
-            // this decodes a non-special instruction
+            // DECODES a non-special instruction
             group_t instructionGroup = decodeInstruction(fetchedInstruction);
 
             // EXECUTE the instruction

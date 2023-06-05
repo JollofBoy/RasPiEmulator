@@ -6,9 +6,14 @@
 #include "registers.h"
 #include "utils.h"
 
-// creating the variables for the structures
+// general registers
 static uint64_t generalRegisters[GENERAL_REG_NUM];
-static pstate_t pstate;
+
+// PSTATE
+// had to initialise the pstate here cos it doesn't seem to stick during compile time (may not be the case)
+static pstate_t pstate = {.negativeFlag = false, .zeroFlag = true, .carryFlag = false, .overflowFlag = false};
+
+// special registers
 static uint64_t zeroRegister;
 static uint64_t programCounter;
 
@@ -23,11 +28,11 @@ void writeXn(uint64_t value, int registerN) {
 
 // 32-bit mode manipulations
 uint32_t readWn(int n) {
-    return generalRegisters[n] & 0x00000000ffffffff;
+    return generalRegisters[n] & THIRTYTWO_BIT_MASK;
 }
 
 void writeWn(uint32_t value, int registerN) {
-    generalRegisters[registerN] = 0x00000000ffffffff & value;
+    generalRegisters[registerN] = THIRTYTWO_BIT_MASK & value;
 }
 
 // register initialise function here 
@@ -38,10 +43,6 @@ void registerInitialise(void) {
 
     zeroRegister = 0;
     programCounter = 0;
-    pstate.negativeFlag = 0;
-    pstate.zeroFlag = 0;
-    pstate.carryFlag = 0;
-    pstate.overflowFlag = 0;
 }
 
 // getting the value of the zeroRegister
@@ -59,5 +60,35 @@ void incrementProgramCounter(int n) {
     programCounter += n;
 }
 
-// here we would edit the PSTATE in some way if needed
-// cos they said there would be cheeky lil edits here
+// sets the boolean value of the flag
+void setN(bool value) {
+    pstate.negativeFlag = value;
+}
+
+void setZ(bool value) {
+    pstate.zeroFlag = value;
+}
+
+void setC(bool value) {
+    pstate.carryFlag = value;
+}
+
+void setV(bool value) {
+    pstate.overflowFlag = value;
+}
+
+bool getN(void) {
+    return pstate.negativeFlag;
+}
+
+bool getZ(void) {
+    return pstate.zeroFlag;
+}
+
+bool getC(void) {
+    return pstate.carryFlag;
+}
+
+bool getV(void) {
+    return pstate.overflowFlag;
+}
