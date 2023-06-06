@@ -10,28 +10,81 @@
 
 // private functions
 
+static void move(uint8_t opcode, uint64_t op, uint64_t dest, uint8_t bitWidth, uint8_t shiftVal) {
+    switch (opcode) {
+        case 0x0: /*movn*/
+            writeToRegister(~op, dest, bitWidth);
+            break;
+        case 0x2: /*movz*/
+            writeToRegister(op, dest, bitWidth);
+
+            // the zero flag is set as zero is passed
+            setZ(1);
+            break;
+        case 0x3: ; /*movk*/
+            // I need to understand how this works properly
+            uint64_t valueToParse = readXn(dest);
+            uint64_t maskToClearRangeBits = ~(SIXTEEN_BIT_MASK << shiftVal);
+            
+            // this replaces the range that op occupies with op
+            valueToParse = (valueToParse & maskToClearRangeBits) | op;
+
+            // WARNING: parsing the value here means that the top 32 bits will be wiped if sf is 0
+            writeToRegister(valueToParse, dest, bitWidth);
+            break;
+    }
+}
+
+// public functions
+
+void executeDPI(void) {
+    // based on rd, we encode zr(so do nothing) if it is 0x1f so it seems we don't need to check for it
+    // if the instruction is arithmetic and doesn't set condition flags, sp is encoded(no need to do this)
+
+    // sf means bit-width of all registers in instruction. 0 for 32-bit, 1 for 64-bit
+    // when sf == 0, rd is accessed as wd
+    uint32_t width = (instructionPtr->sf == 0) ? 32 : 64;
+    
+    // opi determines the type of data processing operation.
+    // 010 means Arithmetic instruction, 101 means Wide Move
+    switch (instructionPtr->opi) {
+        case 0x2: ; /*Arithmetic instruction*/   // the semi colon is there to remove the declaration error
+            uint8_t shift12 = instructionPtr->operand->sh * 12;
+            uint64_t workingImm12 = instructionPtr->operand->imm12 << shift12;
+            uint64_t arithResult = arithOpOn(instructionPtr->operand->rnOperand, workingImm12, instructionPtr->opc, width);
+            // writes to the correct width register
+            writeToRegister(arithResult, instructionPtr->rd, width);
+            break;
+        case 0x5: ; /*Wide Move*/
+            uint8_t shift16 = instructionPtr->operand->hw * 16;
+            uint64_t workingImm16 = instructionPtr->operand->imm16 << shift16;
+            move(instructionPtr->opc, workingImm16, instructionPtr->rd, width, shift16);
+            break;
+    }
+}
+
 // returns the mask that we should use for a given function
-static uint64_t activeMask(uint8_t bitWidth) {
+uint64_t activeMask(uint8_t bitWidth) {
     return (bitWidth == 32) ? THIRTYTWO_BIT_MASK : SIXTYFOUR_BIT_MASK;
 }
 
 // returns the maximum value that we should use for a given function
-static uint64_t activeMax(uint8_t bitWidth) {
+uint64_t activeMax(uint8_t bitWidth) {
     return (bitWidth == 32) ? MAX32 : MAX64;
 }
 
 // returns the sign bit of a given number
-static uint8_t signBitOf(uint64_t value, uint8_t bitWidth) {
+uint8_t signBitOf(uint64_t value, uint8_t bitWidth) {
     return value >> (bitWidth-1);
 }
 
 // writes the result to the destination register
-static void writeToRd(uint64_t result, uint64_t destinationRegister, uint8_t width) {
-    (width == 32) ? writeWn(result & THIRTYTWO_BIT_MASK, destinationRegister) : writeXn(result, destinationRegister);
+void writeToRegister(uint64_t result, uint64_t destinationRegister, uint8_t bitWidth) {
+    (bitWidth == 32) ? writeWn(result & THIRTYTWO_BIT_MASK, destinationRegister) : writeXn(result, destinationRegister);
 }
 
 // takes out the commonality for add instructions
-static uint64_t add(uint64_t operand1, uint64_t operand2, uint8_t bitWidth) {
+uint64_t add(uint64_t operand1, uint64_t operand2, uint8_t bitWidth) {
     // the result to be passed to rd and is adjusted to the correct bit width
     uint64_t result = (operand1 + operand2) & activeMask(bitWidth);
 
@@ -53,7 +106,7 @@ static uint64_t add(uint64_t operand1, uint64_t operand2, uint8_t bitWidth) {
 }
 
 // returns the result of an arith operation
-static uint64_t arithOpOn(uint64_t operand1, uint64_t operand2, uint8_t opcode, uint8_t bitWidth) {
+uint64_t arithOpOn(uint64_t operand1, uint64_t operand2, uint8_t opcode, uint8_t bitWidth) {
     // the result to be passed to rd
     uint64_t result;
 
@@ -102,55 +155,4 @@ static uint64_t arithOpOn(uint64_t operand1, uint64_t operand2, uint8_t opcode, 
     }
 
     return result;
-}
-
-static void move(uint8_t opcode, uint64_t op, uint64_t dest, uint8_t bitWidth, uint8_t shiftVal) {
-    switch (opcode) {
-        case 0x0: /*movn*/
-            writeToRd(~op, dest, bitWidth);
-            break;
-        case 0x2: /*movz*/
-            writeToRd(op, dest, bitWidth);
-
-            // the zero flag is set as zero is passed
-            setZ(1);
-            break;
-        case 0x3: ; /*movk*/
-            // I need to understand how this works properly
-            uint64_t valueToParse = readXn(dest);
-            uint64_t maskToClearRangeBits = ~(SIXTEEN_BIT_MASK << shiftVal);
-            
-            // this replaces the range that op occupies with op
-            valueToParse = (valueToParse & maskToClearRangeBits) | op;
-
-            // WARNING: parsing the value here means that the top 32 bits will be wiped if sf is 0
-            writeToRd(valueToParse, dest, bitWidth);
-            break;
-    }
-}
-
-void executeDPI(void) {
-    // based on rd, we encode zr(so do nothing) if it is 0x1f so it seems we don't need to check for it
-    // if the instruction is arithmetic and doesn't set condition flags, sp is encoded(no need to do this)
-
-    // sf means bit-width of all registers in instruction. 0 for 32-bit, 1 for 64-bit
-    // when sf == 0, rd is accessed as wd
-    uint32_t width = (instructionPtr->sf == 0) ? 32 : 64;
-    
-    // opi determines the type of data processing operation.
-    // 010 means Arithmetic instruction, 101 means Wide Move
-    switch (instructionPtr->opi) {
-        case 0x2: ; /*Arithmetic instruction*/   // the semi colon is there to remove the declaration error
-            uint8_t shift12 = instructionPtr->operand->sh * 12;
-            uint64_t workingImm12 = instructionPtr->operand->imm12 << shift12;
-            uint64_t arithResult = arithOpOn(instructionPtr->operand->rnOperand, workingImm12, instructionPtr->opc, width);
-            // writes to the correct width register
-            writeToRd(arithResult, instructionPtr->rd, width);
-            break;
-        case 0x5: ; /*Wide Move*/
-            uint8_t shift16 = instructionPtr->operand->hw * 16;
-            uint64_t workingImm16 = instructionPtr->operand->imm16 << shift16;
-            move(instructionPtr->opc, workingImm16, instructionPtr->rd, width, shift16);
-            break;
-    }
 }
