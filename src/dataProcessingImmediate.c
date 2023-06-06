@@ -19,7 +19,7 @@ static void move(uint8_t opcode, uint64_t op, uint64_t dest, uint8_t bitWidth, u
             writeToRegister(op, dest, bitWidth);
 
             // the zero flag is set as zero is passed
-            setZ(1);
+            //setZ(1);
             break;
         case 0x3: ; /*movk*/
             // I need to understand how this works properly
@@ -83,28 +83,6 @@ void writeToRegister(uint64_t result, uint64_t destinationRegister, uint8_t bitW
     (bitWidth == 32) ? writeWn(result & THIRTYTWO_BIT_MASK, destinationRegister) : writeXn(result, destinationRegister);
 }
 
-// takes out the commonality for add instructions
-uint64_t add(uint64_t operand1, uint64_t operand2, uint8_t bitWidth) {
-    // the result to be passed to rd and is adjusted to the correct bit width
-    uint64_t result = (operand1 + operand2) & activeMask(bitWidth);
-
-    // looking for if there is a carry bit
-    uint8_t carryBit = (operand1 > activeMax(bitWidth) - operand2) ? 1 : 0; 
-            
-    // setting the flags
-
-    // when there is no carry bit and the result is 0, then we set the zero flag to 1
-    if (result == 0 && carryBit == 0) {
-        setZ(1); 
-    }
-            
-    // if the carry bit is 1 then we set the carry flag to 1
-    // could've have written setC(carryBit); but I wanted to make it clearer
-    (carryBit == 1) ? setC(1) : setC(0);
-
-    return result;
-}
-
 // returns the result of an arith operation
 uint64_t arithOpOn(uint64_t operand1, uint64_t operand2, uint8_t opcode, uint8_t bitWidth) {
     // the result to be passed to rd
@@ -113,15 +91,26 @@ uint64_t arithOpOn(uint64_t operand1, uint64_t operand2, uint8_t opcode, uint8_t
     // opcode determines the operation to be performed
     switch (opcode) {
         case 0x0: /*add*/
-            result = add(operand1, operand2, bitWidth);
+            // the result to be passed to rd and is adjusted to the correct bit width
+            result = (operand1 + operand2) & activeMask(bitWidth);
             break;
         case 0x1: /*adds*/
-            result = add(operand1, operand2, bitWidth);
+            result = (operand1 + operand2) & activeMask(bitWidth);
+            
+            // looking for if there is a carry bit
+            uint8_t carryBit = (operand1 > activeMax(bitWidth) - operand2) ? 1 : 0; 
 
-            // setting the remaining flags
+            // setting the flags
             
             // if the sign bit is 1, then the number is negative
             (signBitOf(result, bitWidth) == 0x1) ? setN(1) : setN(0);
+
+            // if the result is 0 and the borrow bit is 0, then we set the zero flag to 1 
+            (result == 0 && carryBit == 0) ? setZ(1) : setZ(0);
+
+            // if the carry bit is 1 then we set the carry flag to 1
+            // could've have written setC(carryBit); but I wanted to make it clearer
+            (carryBit == 1) ? setC(1) : setC(0);
 
             // if the operands have the same sign but the result has a different sign, then we set the overflow flag to 1 
             bool sameSign = signBitOf(operand1, bitWidth) == signBitOf(operand2, bitWidth);
@@ -137,13 +126,11 @@ uint64_t arithOpOn(uint64_t operand1, uint64_t operand2, uint8_t opcode, uint8_t
 
             // setting the flags
 
-            // if the sign bit is 1, then the number is negative
+            // if the sign bit is 1, then the number is negative, so set the negative flag to 1
             (signBitOf(result, bitWidth) == 0x1) ? setN(1) : setN(0);
 
             // if the result is 0 and the borrow bit is 0, then we set the zero flag to 1 
-            if (result == 0 && borrowBit == 0) {
-                setZ(1);
-            }
+            (result == 0 && borrowBit == 0) ? setZ(1) : setZ(0);
 
             // TODO here it says something about if there is a borrow then we set it to 0??? (we will diagnose after testing)
             // if the borrow bit is 1, then we set the carry flag to 1 (for now)

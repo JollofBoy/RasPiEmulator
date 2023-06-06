@@ -49,6 +49,54 @@ static uint64_t shiftRm(uint64_t memoryRegister, uint32_t shiftType, uint64_t sh
     return result;
 }
 
+static uint64_t logicOpOn(uint64_t operand1, uint64_t operand2, uint8_t opcode, uint8_t n, uint8_t bitWidth) {
+    // the result to be returned for ands and bics
+    uint64_t result;
+
+    // checking for the different combinations of opc and N
+    if (opcode == 0x0 && n == 0) { /*and*/
+        return operand1 & operand2;
+    } else if (opcode == 0x0 && n == 1) { /*bic*/
+        return operand1 & (~operand2);
+    } else if (opcode == 0x1 && n == 0) { /*orr*/
+        return operand1 | operand2;
+    } else if (opcode == 0x1 && n == 1) { /*orn*/
+        return operand1 | (~operand2);
+    } else if (opcode == 0x2 && n == 0) { /*eon*/
+        return operand1 ^ operand2;
+    } else if (opcode == 0x2 && n == 1) { /*eor*/
+        return operand1 ^ (~operand2);
+    } else if (opcode == 0x3 && n == 0) { /*ands*/
+        result = operand1 & operand2;
+        // setting the flags
+
+        // if the sign bit is 1, then the number is negative, so set the negative flag to 1
+        (signBitOf(result, bitWidth) == 0x1) ? setN(1) : setN(0);
+
+        // when the result is 0, then we set the zero flag to 1
+        (result == 0) ? setZ(1) : setZ(0);
+
+        // these two are always set to 0
+        setC(0);
+        setV(0);
+    } else { /*bics*/
+        result = operand1 & (~operand2);
+        // setting the flags
+
+        // if the sign bit is 1, then the number is negative, so set the negative flag to 1
+        (signBitOf(result, bitWidth) == 0x1) ? setN(1) : setN(0);
+
+        // when the result is 0, then we set the zero flag to 1
+        (result == 0) ? setZ(1) : setZ(0);
+
+        // these two are always set to 0
+        setC(0);
+        setV(0);
+    }
+
+    return result;
+}
+
 // public functions
 
 void executeDPR(void) {
@@ -66,8 +114,12 @@ void executeDPR(void) {
         
     } else if (instructionPtr->M == 0 && instructionPtr->opr->msb == 0) { /*Bit-Logic*/
         // shift the memory register to what it needs to be
-        //uint64_t workingRm = shiftRm(instructionPtr->rm, instructionPtr->opr->shift, instructionPtr->operand->imm6, width);
-        
+        uint64_t workingRm = shiftRm(instructionPtr->rm, instructionPtr->opr->shift, instructionPtr->operand->imm6, width);
+        uint64_t logicResult = logicOpOn(instructionPtr->rnInstruct, workingRm, instructionPtr->opc, instructionPtr->opr->N, width);
+
+        // writes the result of the logic operation to rd
+        writeToRegister(logicResult, instructionPtr->rd, width);
+
     } else { /*Multiply*/
         // we will do the changes that gotta happen
 

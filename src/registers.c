@@ -11,7 +11,7 @@ static uint64_t generalRegisters[GENERAL_REG_NUM];
 
 // PSTATE
 // had to initialise the pstate here cos it doesn't seem to stick during compile time (may not be the case)
-static pstate_t pstate = {.negativeFlag = false, .zeroFlag = false, .carryFlag = false, .overflowFlag = false};
+static pstate_t pstate = {.negativeFlag = false, .zeroFlag = true, .carryFlag = false, .overflowFlag = false};
 
 // special registers
 static uint64_t zeroRegister;

@@ -11,6 +11,5 @@ extern uint8_t signBitOf(uint64_t, uint8_t);
 // writes a value to the register of appropriate size
 extern void writeToRegister(uint64_t, uint64_t, uint8_t);
 
-// both used to perform arithmetic on values passed
-extern uint64_t add(uint64_t, uint64_t, uint8_t);
+// used to find the result of an arithmetic operation
 extern uint64_t arithOpOn(uint64_t, uint64_t, uint8_t, uint8_t);
