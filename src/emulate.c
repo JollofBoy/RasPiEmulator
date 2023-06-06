@@ -41,6 +41,8 @@ int main(int argc, char **argv) {
         char *outFile = argv[2];
         output(outFile);
     }
+
+    // the emulation has finished
     return EXIT_SUCCESS;
 }
 

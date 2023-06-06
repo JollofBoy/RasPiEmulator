@@ -25,12 +25,9 @@ static uint8_t signBitOf(uint64_t value, uint8_t bitWidth) {
     return value >> (bitWidth-1);
 }
 
-// returns the shifed or un-shifted version of imm12
-static uint64_t getImm12(uint8_t shift, uint64_t immVal, uint8_t bitWidth) {
-    if (shift == 1) {
-        return (immVal << 12) & activeMask(bitWidth);
-    }
-    return immVal & activeMask(bitWidth);
+// writes the result to the destination register
+static void writeToRd(uint64_t result, uint64_t destinationRegister, uint8_t width) {
+    (width == 32) ? writeWn(result & THIRTYTWO_BIT_MASK, destinationRegister) : writeXn(result, destinationRegister);
 }
 
 // takes out the commonality for add instructions
@@ -44,7 +41,9 @@ static uint64_t add(uint64_t operand1, uint64_t operand2, uint8_t bitWidth) {
     // setting the flags
 
     // when there is no carry bit and the result is 0, then we set the zero flag to 1
-    (result == 0 && carryBit == 0) ? setZ(1) : setZ(0); 
+    if (result == 0 && carryBit == 0) {
+        setZ(1); 
+    }
             
     // if the carry bit is 1 then we set the carry flag to 1
     // could've have written setC(carryBit); but I wanted to make it clearer
@@ -60,10 +59,10 @@ static uint64_t arithOpOn(uint64_t operand1, uint64_t operand2, uint8_t opcode, 
 
     // opcode determines the operation to be performed
     switch (opcode) {
-        case 0x0: // add
+        case 0x0: /*add*/
             result = add(operand1, operand2, bitWidth);
             break;
-        case 0x1: //adds
+        case 0x1: /*adds*/
             result = add(operand1, operand2, bitWidth);
 
             // setting the remaining flags
@@ -75,10 +74,10 @@ static uint64_t arithOpOn(uint64_t operand1, uint64_t operand2, uint8_t opcode, 
             bool sameSign = signBitOf(operand1, bitWidth) == signBitOf(operand2, bitWidth);
             (sameSign && signBitOf(operand2, bitWidth) != signBitOf(result, bitWidth)) ? setV(1) : setV(0);
             break;
-        case 0x2: //sub
+        case 0x2: /*sub*/
             result = (operand1 - operand2) & activeMask(bitWidth);
             break;
-        case 0x3: //subs
+        case 0x3: /*subs*/
             result = (operand1 - operand2) & activeMask(bitWidth);
 
             uint8_t borrowBit = (operand1 < MIN + operand2) ? 1 : 0;
@@ -89,7 +88,9 @@ static uint64_t arithOpOn(uint64_t operand1, uint64_t operand2, uint8_t opcode, 
             (signBitOf(result, bitWidth) == 0x1) ? setN(1) : setN(0);
 
             // if the result is 0 and the borrow bit is 0, then we set the zero flag to 1 
-            (result == 0 && borrowBit == 0) ? setZ(1) : setZ(0);
+            if (result == 0 && borrowBit == 0) {
+                setZ(1);
+            }
 
             // TODO here it says something about if there is a borrow then we set it to 0??? (we will diagnose after testing)
             // if the borrow bit is 1, then we set the carry flag to 1 (for now)
@@ -103,6 +104,31 @@ static uint64_t arithOpOn(uint64_t operand1, uint64_t operand2, uint8_t opcode, 
     return result;
 }
 
+static void move(uint8_t opcode, uint64_t op, uint64_t dest, uint8_t bitWidth, uint8_t shiftVal) {
+    switch (opcode) {
+        case 0x0: /*movn*/
+            writeToRd(~op, dest, bitWidth);
+            break;
+        case 0x2: /*movz*/
+            writeToRd(op, dest, bitWidth);
+
+            // the zero flag is set as zero is passed
+            setZ(1);
+            break;
+        case 0x3: ; /*movk*/
+            // I need to understand how this works properly
+            uint64_t valueToParse = readXn(dest);
+            uint64_t maskToClearRangeBits = ~(SIXTEEN_BIT_MASK << shiftVal);
+            
+            // this replaces the range that op occupies with op
+            valueToParse = (valueToParse & maskToClearRangeBits) | op;
+
+            // WARNING: parsing the value here means that the top 32 bits will be wiped if sf is 0
+            writeToRd(valueToParse, dest, bitWidth);
+            break;
+    }
+}
+
 void executeDPI(void) {
     // based on rd, we encode zr(so do nothing) if it is 0x1f so it seems we don't need to check for it
     // if the instruction is arithmetic and doesn't set condition flags, sp is encoded(no need to do this)
@@ -114,13 +140,17 @@ void executeDPI(void) {
     // opi determines the type of data processing operation.
     // 010 means Arithmetic instruction, 101 means Wide Move
     switch (instructionPtr->opi) {
-        case 0x2: ; // Arithmetic instruction   // the semi colon is there to remove the declaration error
-            uint64_t workingImm12 = getImm12(instructionPtr->operand->sh, instructionPtr->operand->imm12, width);
+        case 0x2: ; /*Arithmetic instruction*/   // the semi colon is there to remove the declaration error
+            uint8_t shift12 = instructionPtr->operand->sh * 12;
+            uint64_t workingImm12 = instructionPtr->operand->imm12 << shift12;
             uint64_t arithResult = arithOpOn(instructionPtr->operand->rnOperand, workingImm12, instructionPtr->opc, width);
             // writes to the correct width register
-            (instructionPtr->sf == 0) ? writeWn(arithResult, instructionPtr->rd) : writeXn(arithResult, instructionPtr->rd);
+            writeToRd(arithResult, instructionPtr->rd, width);
             break;
-        case 0x5: // Wide Move
+        case 0x5: ; /*Wide Move*/
+            uint8_t shift16 = instructionPtr->operand->hw * 16;
+            uint64_t workingImm16 = instructionPtr->operand->imm16 << shift16;
+            move(instructionPtr->opc, workingImm16, instructionPtr->rd, width, shift16);
             break;
     }
 }
