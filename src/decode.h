@@ -29,7 +29,6 @@ typedef struct {
     uint32_t rnOperand;
     uint32_t hw;
     uint32_t imm16;
-    //TODO here we will work with the opr/opc/N related stuff later
     uint32_t imm6;
     uint32_t x;
     uint32_t ra;
@@ -46,6 +45,13 @@ typedef struct {
     //TODO might create some more members to better represent the offset
 } offset_t;
 
+// a struct that contains every possible opr layout
+typedef struct {
+    uint32_t msb;
+    uint32_t shift;
+    uint32_t N;
+} opr_t;
+
 // making a struct which contains every possible memory layout, where operand, opr, and offset are their own structures as well
 typedef struct {
     uint32_t sf;
@@ -54,7 +60,7 @@ typedef struct {
     operand_t *operand;    
     uint32_t rd;
     uint32_t M;
-    uint32_t opr;
+    opr_t *opr;
     uint32_t rm;
     uint32_t rnInstruct;
     uint32_t bit31;

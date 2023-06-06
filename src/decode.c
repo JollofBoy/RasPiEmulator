@@ -36,6 +36,15 @@ static instruction_t *makeInstructStruct(void) {
         free(ptr);
         return NULL;
     }
+
+    ptr->opr = malloc(sizeof(opr_t));
+    if (ptr->opr == NULL) {
+        free(ptr->operand);
+        free(ptr->offset);
+        free(ptr);
+        return NULL;
+    }
+
     return ptr;
 }
 
@@ -64,7 +73,6 @@ static void loadDPR(uint32_t id, uint32_t instr) {
     instructionPtr->sf = instr >> 31;
     instructionPtr->opc = TWO_BIT_MASK & (instr >> 29);
     instructionPtr->M = ONE_BIT_MASK & (instr >> 28);
-    instructionPtr->opr = FOUR_BIT_MASK & (instr >> 21);
     instructionPtr->rm = FIVE_BIT_MASK & (instr >> 16);
     instructionPtr->rnInstruct = FIVE_BIT_MASK & (instr >> 5);
     instructionPtr->rd = FIVE_BIT_MASK & instr;
@@ -72,6 +80,10 @@ static void loadDPR(uint32_t id, uint32_t instr) {
     instructionPtr->operand->imm6 = SIX_BIT_MASK & (instr >> 10);
     instructionPtr->operand->x = ONE_BIT_MASK & (instr >> 15);
     instructionPtr->operand->ra = FIVE_BIT_MASK & (instr >> 10);
+    
+    instructionPtr->opr->msb = ONE_BIT_MASK & (instr >> 24);
+    instructionPtr->opr->shift = TWO_BIT_MASK & (instr >> 22);
+    instructionPtr->opr->N = ONE_BIT_MASK & (instr >> 21);
 }
 
 static void loadLAS(uint32_t id, uint32_t instr) {
@@ -153,7 +165,6 @@ void printInstructStructContents(void) {
     printf("%s = %x\n", getName(opi), instructionPtr->opi);
     printf("%s = %x\n", getName(rd), instructionPtr->rd);
     printf("%s = %x\n", getName(M), instructionPtr->M);
-    printf("%s = %x\n", getName(opr), instructionPtr->opr);
     printf("%s = %x\n", getName(rm), instructionPtr->rm);
     printf("%s = %x\n", getName(rnInstruct), instructionPtr->rnInstruct);
     printf("%s = %x\n", getName(bit31), instructionPtr->bit31);
@@ -182,6 +193,10 @@ void printInstructStructContents(void) {
     printf("Offset -> %s = %d\n", getName(I), instructionPtr->offset->I);
     printf("Offset -> %s = %d\n", getName(bit10), instructionPtr->offset->bit10);
     printf("Offset -> %s = %d\n", getName(imm12), instructionPtr->offset->imm12);
+   
+    printf("opr -> %s = %d\n", getName(msb), instructionPtr->opr->msb);
+    printf("opr -> %s = %d\n", getName(shift), instructionPtr->opr->shift);
+    printf("opr -> %s = %d\n", getName(N), instructionPtr->opr->N);
 }
 
 void deleteInstructStruct(instruction_t *ptr) {
@@ -189,6 +204,7 @@ void deleteInstructStruct(instruction_t *ptr) {
     if (ptr != NULL) {
         free(ptr->operand);
         free(ptr->offset);
+        free(ptr->opr);
         free(ptr);
     }
 }
