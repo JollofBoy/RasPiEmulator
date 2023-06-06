@@ -8,7 +8,7 @@
 #include "registers.h"
 
 // private file pointer
-FILE *fptr;
+static FILE *fptr;
 
 // private functions
 static void outputGeneralRegisters(void) {
@@ -40,8 +40,11 @@ static void outputNonZeroMemory(void) {
 }
 
 void output(char *outputFile) {
-    // opens the file in write mode
-    fptr = fopen(outputFile, "w");
+    if (outputFile[0] == 'p') { // if 'p' is parsed, then the pointer points to stdout
+        fptr = stdout;
+    } else { // otherwise opens the file in write mode
+        fptr = fopen(outputFile, "w");
+    }
 
     outputGeneralRegisters();
     outputProgramCounter();

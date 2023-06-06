@@ -50,9 +50,11 @@ typedef struct {
     uint32_t msb;
     uint32_t shift;
     uint32_t N;
+    uint32_t val;
 } opr_t;
 
-// making a struct which contains every possible memory layout, where operand, opr, and offset are their own structures as well
+// making a struct which contains every possible memory layout, where operand, opr,
+// and offset are their own structures as well
 typedef struct {
     uint32_t sf;
     uint32_t opc;
@@ -71,7 +73,8 @@ typedef struct {
     uint32_t rt;
     int32_t simm19;
     int32_t simm26;
-    uint32_t cond; //TODO might make this an enum with the mnemonic and the equivalent code (makes things easier here I think)
+    uint32_t cond; //TODO might make this an enum with the mnemonic and the equivalent code
+                   //(makes things easier here I think)
     uint32_t bits30To31;
 } instruction_t;
 

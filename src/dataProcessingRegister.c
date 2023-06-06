@@ -10,12 +10,14 @@
 #include "memory.h"
 #include "registers.h"
 
-// for the meantime, use the utility function of pow and then once I understand linking better, then we can switch back
+// for the meantime, use the utility function of pow and then once I understand linking better, 
+// then we can switch back
 #include "utils.h"
 
 // private functions
 
-static uint64_t shiftRm(uint64_t memoryRegister, uint32_t shiftType, uint64_t shiftAmount, uint8_t bitWidth) {
+static uint64_t shiftRm(uint64_t memoryRegister, uint32_t shiftType, uint64_t shiftAmount, 
+        uint8_t bitWidth) {
     // the result to be returned
     uint64_t result;
 
@@ -39,7 +41,8 @@ static uint64_t shiftRm(uint64_t memoryRegister, uint32_t shiftType, uint64_t sh
         case 0x3: ; /*ror*/ // rotate right // only valid for logical instructions
             // create a mask that takes the bits that are removed as a result of the right shift
             uint64_t maskForRor = power(2, shiftAmount) - 1;
-            uint64_t bitsToAddToResult = (memoryRegister & activeMask(bitWidth) & maskForRor) << (bitWidth - shiftAmount);
+            uint64_t bitsToAddToResult = (memoryRegister & activeMask(bitWidth) & maskForRor) 
+                << (bitWidth - shiftAmount);
 
             // the result is found by adding the bits to add via or
             result = (memoryRegister & activeMask(bitWidth)) >> shiftAmount | bitsToAddToResult;
@@ -49,23 +52,24 @@ static uint64_t shiftRm(uint64_t memoryRegister, uint32_t shiftType, uint64_t sh
     return result;
 }
 
-static uint64_t logicOpOn(uint64_t operand1, uint64_t operand2, uint8_t opcode, uint8_t n, uint8_t bitWidth) {
+static uint64_t logicOpOn(uint64_t operand1, uint64_t operand2, uint8_t opcode, uint8_t n, 
+        uint8_t bitWidth) {
     // the result to be returned for ands and bics
     uint64_t result;
 
     // checking for the different combinations of opc and N
     if (opcode == 0x0 && n == 0) { /*and*/
-        return operand1 & operand2;
+        result = operand1 & operand2;
     } else if (opcode == 0x0 && n == 1) { /*bic*/
-        return operand1 & (~operand2);
+        result = operand1 & (~operand2);
     } else if (opcode == 0x1 && n == 0) { /*orr*/
-        return operand1 | operand2;
+        result = operand1 | operand2;
     } else if (opcode == 0x1 && n == 1) { /*orn*/
-        return operand1 | (~operand2);
-    } else if (opcode == 0x2 && n == 0) { /*eon*/
-        return operand1 ^ operand2;
-    } else if (opcode == 0x2 && n == 1) { /*eor*/
-        return operand1 ^ (~operand2);
+        result = operand1 | (~operand2);
+    } else if (opcode == 0x2 && n == 0) { /*eor*/
+        result = operand1 ^ operand2;
+    } else if (opcode == 0x2 && n == 1) { /*eon*/
+        result = operand1 ^ (~operand2);
     } else if (opcode == 0x3 && n == 0) { /*ands*/
         result = operand1 & operand2;
         // setting the flags
@@ -97,6 +101,14 @@ static uint64_t logicOpOn(uint64_t operand1, uint64_t operand2, uint8_t opcode, 
     return result;
 }
 
+static uint64_t multOpOn(uint64_t raVal, uint64_t rnVal, uint64_t rmVal, uint8_t x) {
+    if (x == 0) {    
+        return raVal + (rnVal * rmVal); 
+    } else {
+        return raVal - (rnVal * rmVal);
+    }
+}
+
 // public functions
 
 void executeDPR(void) {
@@ -106,22 +118,31 @@ void executeDPR(void) {
 
     if (instructionPtr->M == 0 && instructionPtr->opr->msb == 1) { /*Arithmetic*/
         // shift the memory register to what it needs to be
-        uint64_t workingRm = shiftRm(instructionPtr->rm, instructionPtr->opr->shift, instructionPtr->operand->imm6, width);
-        uint64_t arithResult = arithOpOn(instructionPtr->rnInstruct, workingRm, instructionPtr->opc, width);
+        uint64_t workingRm = shiftRm(instructionPtr->rm, instructionPtr->opr->shift, 
+                instructionPtr->operand->imm6, width);
+        uint64_t arithResult = arithOpOn(instructionPtr->rnInstruct, workingRm, 
+                instructionPtr->opc, width);
 
         // writes the result of the arithmetic operation to rd
         writeToRegister(arithResult, instructionPtr->rd, width);
         
     } else if (instructionPtr->M == 0 && instructionPtr->opr->msb == 0) { /*Bit-Logic*/
         // shift the memory register to what it needs to be
-        uint64_t workingRm = shiftRm(instructionPtr->rm, instructionPtr->opr->shift, instructionPtr->operand->imm6, width);
-        uint64_t logicResult = logicOpOn(instructionPtr->rnInstruct, workingRm, instructionPtr->opc, instructionPtr->opr->N, width);
+        uint64_t workingRm = shiftRm(instructionPtr->rm, instructionPtr->opr->shift, 
+                instructionPtr->operand->imm6, width);
+        uint64_t logicResult = logicOpOn(instructionPtr->rnInstruct, workingRm, 
+                instructionPtr->opc, instructionPtr->opr->N, width);
 
         // writes the result of the logic operation to rd
         writeToRegister(logicResult, instructionPtr->rd, width);
 
     } else { /*Multiply*/
         // we will do the changes that gotta happen
+        uint64_t multResult = multOpOn(instructionPtr->operand->ra, instructionPtr->rnInstruct, 
+                instructionPtr->rm, instructionPtr->operand->x);
+
+        // writes the result of the multiplication operation to rd
+        writeToRegister(multResult, instructionPtr->rd, width);
 
     }
 }

@@ -80,5 +80,6 @@ void memoryPrintLoadedContents(char *filename) {
         }
 }
 
-// down here we will include printing the loaded contents of the memory later. Also we will tweak the way in which we print for 
+// down here we will include printing the loaded contents of the memory later
+// Also we will tweak the way in which we print for 
 // it to go to an out file

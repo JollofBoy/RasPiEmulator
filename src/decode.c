@@ -14,7 +14,8 @@
 #define OP0_MASK 0x0000000f 
 
 // definining private functions
-// DISCLAIMER: there are alot of magic numbers here and those will be sorted out in future improvements TODO
+// DISCLAIMER: there are alot of magic numbers here and those will be sorted out in 
+// future improvements TODO
 
 // under here include a global variable pointer that will point to the instruction_t struct
 instruction_t *instructionPtr;
@@ -84,6 +85,7 @@ static void loadDPR(uint32_t id, uint32_t instr) {
     instructionPtr->opr->msb = ONE_BIT_MASK & (instr >> 24);
     instructionPtr->opr->shift = TWO_BIT_MASK & (instr >> 22);
     instructionPtr->opr->N = ONE_BIT_MASK & (instr >> 21);
+    instructionPtr->opr->val = FOUR_BIT_MASK & (instr >> 21);
 }
 
 static void loadLAS(uint32_t id, uint32_t instr) {
@@ -124,19 +126,22 @@ group_t decodeInstruction(uint32_t instruction) {
     // we set the op0 to its value
     op0 = OP0_MASK & (instruction >> OP0_SHIFT);
 
-    // finds what the group of the instruction is based on the op0 and then loads values to the relevant markers
+    // finds what the group of the instruction is based on the op0 and then 
+    // loads values to the relevant markers
     switch (op0) {
         case 0x8:
         case 0x9:
             group = DP_IMMEDIATE;
             printf("DP IMMEDIATE\n");
-            loadDPI(op0, instruction); // this sets the structs to every possible value in the case of DP_IMMEDIATE
+            loadDPI(op0, instruction); // this sets the structs to every possible value 
+                                       // in the case of DP_IMMEDIATE
             break;
         case 0x5:
         case 0xd:
             group = DP_REGISTER;
             printf("DP REGISTER\n");
-            loadDPR(op0, instruction); // this sets the structs to every possible value in the case of DP_REGISTER
+            loadDPR(op0, instruction); // this sets the structs to every possible value
+                                       // in the case of DP_REGISTER
             break;
         case 0x4:
         case 0x6:
@@ -144,13 +149,15 @@ group_t decodeInstruction(uint32_t instruction) {
         case 0xe:
             group = LOADS_AND_STORES;
             printf("LOADS AND STORES\n");
-            loadLAS(op0, instruction); // this sets the structs to every possible value in the case of LOADS_AND_STORES
+            loadLAS(op0, instruction); // this sets the structs to every possible value
+                                       // in the case of LOADS_AND_STORES
             break;
         case 0xa:
         case 0xb:
             group = BRANCHES;
             printf("BRANCHES\n");
-            loadB(op0, instruction); // this sets the structs to every possible value in the case of BRANCHES
+            loadB(op0, instruction); // this sets the structs to every possible value in 
+                                     // the case of BRANCHES
             break;
         default:
             printf("NO MATCH. op0 = %x\n", op0);
@@ -160,43 +167,46 @@ group_t decodeInstruction(uint32_t instruction) {
 }
 
 void printInstructStructContents(void) {
-    printf("%s = %x\n", getName(sf), instructionPtr->sf);
-    printf("%s = %x\n", getName(opc), instructionPtr->opc);
-    printf("%s = %x\n", getName(opi), instructionPtr->opi);
-    printf("%s = %x\n", getName(rd), instructionPtr->rd);
-    printf("%s = %x\n", getName(M), instructionPtr->M);
-    printf("%s = %x\n", getName(rm), instructionPtr->rm);
-    printf("%s = %x\n", getName(rnInstruct), instructionPtr->rnInstruct);
-    printf("%s = %x\n", getName(bit31), instructionPtr->bit31);
-    printf("%s = %x\n", getName(U), instructionPtr->U);
-    printf("%s = %x\n", getName(L), instructionPtr->L);
-    printf("%s = %x\n", getName(xn), instructionPtr->xn);
-    printf("%s = %x\n", getName(rt), instructionPtr->rt);
-    printf("%s = %x\n", getName(cond), instructionPtr->cond);
-    printf("%s = %x\n", getName(bits30To31), instructionPtr->bits30To31);
+    if (instructionPtr != NULL) { /*only if there's a struct available, we can print this out*/
+        printf("%s = %x\n", getName(sf), instructionPtr->sf);
+        printf("%s = %x\n", getName(opc), instructionPtr->opc);
+        printf("%s = %x\n", getName(opi), instructionPtr->opi);
+        printf("%s = %x\n", getName(rd), instructionPtr->rd);
+        printf("%s = %x\n", getName(M), instructionPtr->M);
+        printf("%s = %x\n", getName(rm), instructionPtr->rm);
+        printf("%s = %x\n", getName(rnInstruct), instructionPtr->rnInstruct);
+        printf("%s = %x\n", getName(bit31), instructionPtr->bit31);
+        printf("%s = %x\n", getName(U), instructionPtr->U);
+        printf("%s = %x\n", getName(L), instructionPtr->L);
+        printf("%s = %x\n", getName(xn), instructionPtr->xn);
+        printf("%s = %x\n", getName(rt), instructionPtr->rt);
+        printf("%s = %x\n", getName(cond), instructionPtr->cond);
+        printf("%s = %x\n", getName(bits30To31), instructionPtr->bits30To31);
 
-    printf("%s = %x\n", getName(simm19), instructionPtr->simm19);
-    printf("%s = %x\n", getName(simm26), instructionPtr->simm26);
+        printf("%s = %x\n", getName(simm19), instructionPtr->simm19);
+        printf("%s = %x\n", getName(simm26), instructionPtr->simm26);
 
-    printf("Operand -> %s = %d\n", getName(sh), instructionPtr->operand->sh);
-    printf("Operand -> %s = %d\n", getName(imm12), instructionPtr->operand->imm12);
-    printf("Operand -> %s = %d\n", getName(rnOperand), instructionPtr->operand->rnOperand);
-    printf("Operand -> %s = %d\n", getName(hw), instructionPtr->operand->hw);
-    printf("Operand -> %s = %d\n", getName(imm16), instructionPtr->operand->imm16);
-    printf("Operand -> %s = %d\n", getName(imm6), instructionPtr->operand->imm6);
-    printf("Operand -> %s = %d\n", getName(x), instructionPtr->operand->x);
-    printf("Operand -> %s = %d\n", getName(ra), instructionPtr->operand->ra);
+        printf("Operand -> %s = %d\n", getName(sh), instructionPtr->operand->sh);
+        printf("Operand -> %s = %d\n", getName(imm12), instructionPtr->operand->imm12);
+        printf("Operand -> %s = %d\n", getName(rnOperand), instructionPtr->operand->rnOperand);
+        printf("Operand -> %s = %d\n", getName(hw), instructionPtr->operand->hw);
+        printf("Operand -> %s = %d\n", getName(imm16), instructionPtr->operand->imm16);
+        printf("Operand -> %s = %d\n", getName(imm6), instructionPtr->operand->imm6);
+        printf("Operand -> %s = %d\n", getName(x), instructionPtr->operand->x);
+        printf("Operand -> %s = %d\n", getName(ra), instructionPtr->operand->ra);
     
-    printf("Offset -> %s = %d\n", getName(bit21), instructionPtr->offset->bit21);
-    printf("Offset -> %s = %d\n", getName(xm), instructionPtr->offset->xm);
-    printf("Offset -> %s = %d\n", getName(simm9), instructionPtr->offset->simm9);
-    printf("Offset -> %s = %d\n", getName(I), instructionPtr->offset->I);
-    printf("Offset -> %s = %d\n", getName(bit10), instructionPtr->offset->bit10);
-    printf("Offset -> %s = %d\n", getName(imm12), instructionPtr->offset->imm12);
+        printf("Offset -> %s = %d\n", getName(bit21), instructionPtr->offset->bit21);
+        printf("Offset -> %s = %d\n", getName(xm), instructionPtr->offset->xm);
+        printf("Offset -> %s = %d\n", getName(simm9), instructionPtr->offset->simm9);
+        printf("Offset -> %s = %d\n", getName(I), instructionPtr->offset->I);
+        printf("Offset -> %s = %d\n", getName(bit10), instructionPtr->offset->bit10);
+        printf("Offset -> %s = %d\n", getName(imm12), instructionPtr->offset->imm12);
    
-    printf("opr -> %s = %d\n", getName(msb), instructionPtr->opr->msb);
-    printf("opr -> %s = %d\n", getName(shift), instructionPtr->opr->shift);
-    printf("opr -> %s = %d\n", getName(N), instructionPtr->opr->N);
+        printf("opr -> %s = %d\n", getName(msb), instructionPtr->opr->msb);
+        printf("opr -> %s = %d\n", getName(shift), instructionPtr->opr->shift);
+        printf("opr -> %s = %d\n", getName(N), instructionPtr->opr->N);
+        printf("opr -> %s = %d\n", getName(val), instructionPtr->opr->val);
+    }
 }
 
 void deleteInstructStruct(instruction_t *ptr) {
