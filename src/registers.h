@@ -21,11 +21,19 @@ extern void writeXn(uint64_t, int);
 extern uint32_t readWn(int);
 extern void writeWn(uint32_t, int);
 
+// reading/writing to the correct register mode
+extern void writeToRegister(uint64_t, uint64_t, uint8_t);
+extern uint64_t readFromRegister(uint8_t, uint8_t);
+ 
+
 // initialise function prototype
 extern void registerInitialise(void);
 
 // returns the program counter
 extern uint64_t getProgramCounter(void);
+
+// returns the zero register
+extern uint64_t getZeroRegister(void);
 
 // program counter is incremented by n bytes
 extern void incrementProgramCounter(int);
@@ -41,3 +49,9 @@ extern bool getN(void);
 extern bool getZ(void);
 extern bool getC(void);
 extern bool getV(void);
+
+/// masks the value to the appropriate size
+extern uint64_t activeMask(uint8_t);
+
+// finds the sign bit of a number of a certain size
+extern uint8_t signBitOf(uint64_t, uint8_t);
