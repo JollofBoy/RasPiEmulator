@@ -40,6 +40,8 @@ int main(int argc, char **argv) {
     if (argc == 3) {
         char *outFile = argv[2];
         output(outFile);
+    } else { // when argc == 2
+        output("p");
     }
 
     // the emulation has finished
@@ -59,7 +61,8 @@ void run(void) {
             running = false;
             break;
         } else if (fetchedInstruction == NO_OP_INSTRUCTION) {
-            // EXECUTE the no operation instruction (-1 would mean to skip in the executeInstruction function)
+            // EXECUTE the no operation instruction 
+            // (-1 would mean to skip in the executeInstruction function)
             executeInstruction(-1);
         } else {
             // DECODES a non-special instruction

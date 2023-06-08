@@ -13,7 +13,7 @@
 
 void executeInstruction(int instrGroup /* matches on the group of the instruction */) {
 
-    // prints out the contents of the instruction structure
+    //prints out the contents of the instruction structure
     //printInstructStructContents();
 
     // we are doing a switch case on the different types of instructions
@@ -41,9 +41,6 @@ void executeInstruction(int instrGroup /* matches on the group of the instructio
         case -1:
             incrementProgramCounter(NEXT_INSTRUCTION);
             break;
-        default:
-            printf("NO INSTRUCTION DETECTED. recieved:%d", instrGroup);
-            incrementProgramCounter(NEXT_INSTRUCTION); /*TODO will remove this later*/
     }
 
     // the very last thing to do is free the pointer to the struct to ensure minimal memory usage
