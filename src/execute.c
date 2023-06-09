@@ -14,7 +14,7 @@
 void executeInstruction(int instrGroup /* matches on the group of the instruction */) {
 
     //prints out the contents of the instruction structure
-    //printInstructStructContents();
+    printInstructStructContents();
 
     // we are doing a switch case on the different types of instructions
     switch (instrGroup) {
@@ -35,7 +35,6 @@ void executeInstruction(int instrGroup /* matches on the group of the instructio
             break;
         case BRANCHES:
             // call on executeB (found in the corresponding file)
-            // the program counter will be correctly incremented here
             executeB();
             break;
         case -1:
@@ -43,6 +42,4 @@ void executeInstruction(int instrGroup /* matches on the group of the instructio
             break;
     }
 
-    // the very last thing to do is free the pointer to the struct to ensure minimal memory usage
-    deleteInstructStruct(instructionPtr);
 }

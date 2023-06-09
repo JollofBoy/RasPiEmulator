@@ -51,25 +51,25 @@ static void move(uint8_t opcode, uint64_t op, uint64_t dest, uint8_t bitWidth, u
 void executeDPI(void) {
     // sf means bit-width of all registers in instruction. 0 for 32-bit, 1 for 64-bit
     // when sf == 0, rd is accessed as wd
-    uint8_t width = (instructionPtr->sf == 0) ? 32 : 64;
+    uint8_t width = (instructionPtr.sf == 0) ? 32 : 64;
     
     // opi determines the type of data processing operation.
     // 010 means Arithmetic instruction, 101 means Wide Move
-    switch (instructionPtr->opi) {
+    switch (instructionPtr.opi) {
         case 0x2: ; /*Arithmetic instruction*/
                   // the semi colon is there to remove the declaration error
-            uint8_t shift12 = instructionPtr->operand->sh * 12;
-            uint64_t workingImm12 = instructionPtr->operand->imm12 << shift12;
-            uint64_t workingOperand = readFromRegister(instructionPtr->operand->rnOperand, width);
+            uint8_t shift12 = instructionPtr.operand.sh * 12;
+            uint64_t workingImm12 = instructionPtr.operand.imm12 << shift12;
+            uint64_t workingOperand = readFromRegister(instructionPtr.operand.rnOperand, width);
             uint64_t arithResult = arithOpOn(workingOperand, workingImm12, 
-                    instructionPtr->opc, width);
+                    instructionPtr.opc, width);
 
-            writeToRegister(arithResult, instructionPtr->rd, width);
+            writeToRegister(arithResult, instructionPtr.rd, width);
             break;
         case 0x5: ; /*Wide Move*/
-            uint8_t shift16 = instructionPtr->operand->hw * 16;
-            uint64_t workingImm16 = instructionPtr->operand->imm16 << shift16;
-            move(instructionPtr->opc, workingImm16, instructionPtr->rd, width, shift16);
+            uint8_t shift16 = instructionPtr.operand.hw * 16;
+            uint64_t workingImm16 = instructionPtr.operand.imm16 << shift16;
+            move(instructionPtr.opc, workingImm16, instructionPtr.rd, width, shift16);
             break;
     }
 }
@@ -113,6 +113,8 @@ uint64_t arithOpOn(uint64_t operand1, uint64_t operand2, uint8_t opcode, uint8_t
             result = (operand1 - operand2) & activeMask(bitWidth);
             break;
         case 0x3: /*subs*/
+            //TODO
+            printf("subs");
             result = (operand1 - operand2) & activeMask(bitWidth);
 
             uint8_t borrowBit = (operand1 < MIN + operand2) ? 1 : 0;

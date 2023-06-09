@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
     if (argc == 3) {
         char *outFile = argv[2];
         output(outFile);
-    } else { // when argc == 2
+    } else { /*argc == 2*/
         output("p");
     }
 

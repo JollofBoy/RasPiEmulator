@@ -110,34 +110,34 @@ void executeDPR(void) {
     // if the instruction has a shift, then it is performed on Rm instead of Rd
    
     // sf is the bit-width for all the registers. 0 for 32-bit
-    uint8_t width = (instructionPtr->sf == 0) ? 32 : 64;
+    uint8_t width = (instructionPtr.sf == 0) ? 32 : 64;
 
     // shift the memory register to what it needs to be
-    uint64_t rmValue = readFromRegister(instructionPtr->rm, width);
-    uint64_t rnValue = readFromRegister(instructionPtr->rnInstruct, width);
+    uint64_t rmValue = readFromRegister(instructionPtr.rm, width);
+    uint64_t rnValue = readFromRegister(instructionPtr.rnInstruct, width);
 
-    uint64_t shiftedRmVal = shiftRm(rmValue, instructionPtr->opr->shift, 
-            instructionPtr->operand->imm6, width);
+    uint64_t shiftedRmVal = shiftRm(rmValue, instructionPtr.opr.shift, 
+            instructionPtr.operand.imm6, width);
 
-    if (instructionPtr->M == 0 && instructionPtr->opr->msb == 1) { /*Arithmetic*/
-        uint64_t arithResult = arithOpOn(rnValue, shiftedRmVal, instructionPtr->opc, width);
+    if (instructionPtr.M == 0 && instructionPtr.opr.msb == 1) { /*Arithmetic*/
+        uint64_t arithResult = arithOpOn(rnValue, shiftedRmVal, instructionPtr.opc, width);
 
         // writes the result of the arithmetic operation to rd
-        writeToRegister(arithResult, instructionPtr->rd, width);
+        writeToRegister(arithResult, instructionPtr.rd, width);
         
-    } else if (instructionPtr->M == 0 && instructionPtr->opr->msb == 0) { /*Bit-Logic*/
-        uint64_t logicResult = logicOpOn(rnValue, shiftedRmVal, instructionPtr->opc,
-                instructionPtr->opr->N, width);
+    } else if (instructionPtr.M == 0 && instructionPtr.opr.msb == 0) { /*Bit-Logic*/
+        uint64_t logicResult = logicOpOn(rnValue, shiftedRmVal, instructionPtr.opc,
+                instructionPtr.opr.N, width);
 
         // writes the result of the logic operation to rd
-        writeToRegister(logicResult, instructionPtr->rd, width);
+        writeToRegister(logicResult, instructionPtr.rd, width);
 
     } else { /*Multiply*/
         // finds the result of applying a multiplication of some sort
-        uint64_t raValue = readFromRegister(instructionPtr->operand->ra, width);
-        uint64_t multResult = multOpOn(raValue, rnValue, rmValue, instructionPtr->operand->x);
+        uint64_t raValue = readFromRegister(instructionPtr.operand.ra, width);
+        uint64_t multResult = multOpOn(raValue, rnValue, rmValue, instructionPtr.operand.x);
 
         // writes the result of the multiplication operation to rd
-        writeToRegister(multResult, instructionPtr->rd, width);
+        writeToRegister(multResult, instructionPtr.rd, width);
     }
 }
