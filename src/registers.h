@@ -5,6 +5,9 @@
 #define THIRTYTWO_BIT_MASK 0x00000000ffffffff
 #define SIXTYFOUR_BIT_MASK 0xffffffffffffffff
 
+// this is to increment the pc to the next instruction if there is no branch
+#define NEXT_INSTRUCTION 4
+
 // This contains the types of registers
 typedef struct {
     bool negativeFlag;
@@ -24,7 +27,6 @@ extern void writeWn(uint32_t, int);
 // reading/writing to the correct register mode
 extern void writeToRegister(uint64_t, uint64_t, uint8_t);
 extern uint64_t readFromRegister(uint8_t, uint8_t);
- 
 
 // initialise function prototype
 extern void registerInitialise(void);
@@ -36,7 +38,7 @@ extern uint64_t getProgramCounter(void);
 extern uint64_t getZeroRegister(void);
 
 // program counter is incremented by n bytes
-extern void incrementProgramCounter(int);
+extern void incrementProgramCounter(int64_t);
 
 // these set the flag value
 extern void setN(bool);
@@ -50,8 +52,3 @@ extern bool getZ(void);
 extern bool getC(void);
 extern bool getV(void);
 
-/// masks the value to the appropriate size
-extern uint64_t activeMask(uint8_t);
-
-// finds the sign bit of a number of a certain size
-extern uint8_t signBitOf(uint64_t, uint8_t);

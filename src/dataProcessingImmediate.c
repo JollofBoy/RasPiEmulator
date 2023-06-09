@@ -23,15 +23,21 @@ static uint64_t makeMaskToClearBits(uint8_t bitWidth, uint8_t shiftVal) {
         : CLEAR64_BITS_MASK >> (MAX_SHIFT64 - shiftVal);
 }
 
-static void move(uint8_t opcode, uint64_t op, uint64_t dest, uint8_t bitWidth, uint8_t shiftVal) {
+static void move(uint8_t opcode, uint64_t op, uint8_t dest, uint8_t bitWidth, uint8_t shiftVal) {
     switch (opcode) {
         case 0x0: /*movn*/
+            //TODO
+            printf("movn");
             writeToRegister(~op, dest, bitWidth);
             break;
         case 0x2: /*movz*/
+            //TODO
+            printf("movz");
             writeToRegister(op, dest, bitWidth);
             break;
         case 0x3: ; /*movk*/
+            //TODO
+            printf("movk");
             // I need to understand how this works properly
             uint64_t valueToParse = readXn(dest);
             // has to be the shifted value + 1 so that the 
@@ -41,6 +47,7 @@ static void move(uint8_t opcode, uint64_t op, uint64_t dest, uint8_t bitWidth, u
             valueToParse = (valueToParse & maskToClearBitsInRange) | op;
 
             // WARNING: parsing the value here means that the top 32 bits will be wiped if sf is 0
+            // TODO might need to make this readXn ???
             writeToRegister(valueToParse, dest, bitWidth);
             break;
     }
@@ -51,25 +58,25 @@ static void move(uint8_t opcode, uint64_t op, uint64_t dest, uint8_t bitWidth, u
 void executeDPI(void) {
     // sf means bit-width of all registers in instruction. 0 for 32-bit, 1 for 64-bit
     // when sf == 0, rd is accessed as wd
-    uint8_t width = (instructionPtr->sf == 0) ? 32 : 64;
+    uint8_t width = (instruction.sf == 0) ? 32 : 64;
     
     // opi determines the type of data processing operation.
     // 010 means Arithmetic instruction, 101 means Wide Move
-    switch (instructionPtr->opi) {
+    switch (instruction.opi) {
         case 0x2: ; /*Arithmetic instruction*/
                   // the semi colon is there to remove the declaration error
-            uint8_t shift12 = instructionPtr->operand->sh * 12;
-            uint64_t workingImm12 = instructionPtr->operand->imm12 << shift12;
-            uint64_t workingOperand = readFromRegister(instructionPtr->operand->rnOperand, width);
+            uint8_t shift12 = instruction.operand.sh * 12;
+            uint64_t workingImm12 = instruction.operand.imm12 << shift12;
+            uint64_t workingOperand = readFromRegister(instruction.operand.rnOperand, width);
             uint64_t arithResult = arithOpOn(workingOperand, workingImm12, 
-                    instructionPtr->opc, width);
+                    instruction.opc, width);
 
-            writeToRegister(arithResult, instructionPtr->rd, width);
+            writeToRegister(arithResult, instruction.rd, width);
             break;
         case 0x5: ; /*Wide Move*/
-            uint8_t shift16 = instructionPtr->operand->hw * 16;
-            uint64_t workingImm16 = instructionPtr->operand->imm16 << shift16;
-            move(instructionPtr->opc, workingImm16, instructionPtr->rd, width, shift16);
+            uint8_t shift16 = instruction.operand.hw * 16;
+            uint64_t workingImm16 = instruction.operand.imm16 << shift16;
+            move(instruction.opc, workingImm16, instruction.rd, width, shift16);
             break;
     }
 }
@@ -113,6 +120,8 @@ uint64_t arithOpOn(uint64_t operand1, uint64_t operand2, uint8_t opcode, uint8_t
             result = (operand1 - operand2) & activeMask(bitWidth);
             break;
         case 0x3: /*subs*/
+            //TODO
+            printf("subs");
             result = (operand1 - operand2) & activeMask(bitWidth);
 
             uint8_t borrowBit = (operand1 < MIN + operand2) ? 1 : 0;

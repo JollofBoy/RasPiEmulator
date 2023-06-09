@@ -17,7 +17,7 @@ static pstate_t pstate = {.negativeFlag = false, .zeroFlag = true,
 
 // special registers
 static uint64_t zeroRegister;
-static uint64_t programCounter;
+static int64_t programCounter;
 
 // 64-bit mode manipulations
 uint64_t readXn(int n) {
@@ -51,16 +51,6 @@ uint64_t readFromRegister(uint8_t reg, uint8_t bitWidth) {
     return (bitWidth == 32) ? readWn(reg) : readXn(reg);
 }
 
-// returns a mask ofo the correct bitWidth
-uint64_t activeMask(uint8_t bitWidth) {
-    return (bitWidth == 32) ? THIRTYTWO_BIT_MASK : SIXTYFOUR_BIT_MASK;
-}
-
-// returns the sign bit of a given number
-uint8_t signBitOf(uint64_t value, uint8_t bitWidth) {
-    return value >> (bitWidth-1);
-}
-
 // register initialise function here 
 void registerInitialise(void) {
     for (int i=0; i<GENERAL_REG_NUM; i++) {
@@ -82,7 +72,7 @@ uint64_t getProgramCounter(void) {
 }
 
 // increments the program counter by n bytes 
-void incrementProgramCounter(int n) {
+void incrementProgramCounter(int64_t n) {
     programCounter += n;
 }
 

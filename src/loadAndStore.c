@@ -69,29 +69,29 @@ void executeLAS(void) {
     // first we split this into the Single Data Transfer and Load Literal instructions
    
     // when sf == 0, rt becomes 32-bit
-    uint32_t width = (instructionPtr->sf == 0) ? 32 : 64;
+    uint32_t width = (instruction.sf == 0) ? 32 : 64;
     uint64_t memAddressToAccess;
 
-    switch (instructionPtr->bit31) {
+    switch (instruction.bit31) {
         case 1: ; /*Single Data Transfer*/
-            uint64_t xmVal = readXn(instructionPtr->offset->xm);
+            uint64_t xmVal = readXn(instruction.offset.xm);
 
             // here the memory address that we are going to access is called here
-            memAddressToAccess = getMemAddressToAccess(instructionPtr->xn, instructionPtr->U,
-                    width, instructionPtr->offset->imm12, instructionPtr->offset->bit21, xmVal,
-                    instructionPtr->offset->I, instructionPtr->offset->simm9);
+            memAddressToAccess = getMemAddressToAccess(instruction.xn, instruction.U,
+                    width, instruction.offset.imm12, instruction.offset.bit21, xmVal,
+                    instruction.offset.I, instruction.offset.simm9);
             
             // here we will do different operations depending on the value of L
-            loadOrStore(memAddressToAccess, instructionPtr->rt, width, instructionPtr->L);
+            loadOrStore(memAddressToAccess, instruction.rt, width, instruction.L);
 
             break;
         case 0: /*Load Literal*/
             // this is a simple calculation so no need for another function
             // this part might be a bit shaky
-            memAddressToAccess = getProgramCounter() + ((int64_t) instructionPtr->simm19 * 4); 
+            memAddressToAccess = getProgramCounter() + ((int64_t) instruction.simm19 * 4); 
 
             // as this is always a load, we will store the data in here into the register
-            load(memAddressToAccess, instructionPtr->rt, width);
+            load(memAddressToAccess, instruction.rt, width);
            
             break;
     }
