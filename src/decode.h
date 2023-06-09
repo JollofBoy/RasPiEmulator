@@ -80,7 +80,7 @@ typedef struct {
 } instruction_t;
 
 // under here include a global variable pointer that will point to the instruction_t struct
-extern instruction_t instructionPtr;
+extern instruction_t instruction;
     
 // decodes an instruction and sets the structs to contain every possible marker for the given op0
 extern group_t decodeInstruction(uint32_t);
