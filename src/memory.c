@@ -69,10 +69,10 @@ void memoryPrintLoadedContents(char *filename) {
     printf("The size of this file is: %d bytes\n", size);
 
         // printing out the contents of the memory
-        for (int address=0; address<size; address++) {
-            printf("The value of address: %x is :", address);
-            printf("%x\n", memoryRead8(address));
-        }
+        //for (int address=0; address<size; address++) {
+            //printf("The value of address: %x is :", address);
+            //printf("%x\n", memoryRead8(address));
+        //}
 
         // prints out the words in memory location
         for (int a=0; a<size; a+=FOUR_BYTES) {

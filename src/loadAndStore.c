@@ -21,7 +21,6 @@ static uint64_t getMemAddressToAccess(uint64_t baseRegister, uint8_t unsignedOff
         memoryAddressToAccess = readXn(baseRegister) + imm12Val * multiplier;
 
     } else if (bit21Val == 1) { /*Register Offset*/
-        // TODO I need this to addd the memory of both of these registers
         memoryAddressToAccess = readXn(baseRegister) + xmVal; 
 
     } else if (IVal == 1) { /*Pre-Indexed*/
@@ -88,7 +87,7 @@ void executeLAS(void) {
         case 0: /*Load Literal*/
             // this is a simple calculation so no need for another function
             // this part might be a bit shaky
-            memAddressToAccess = getProgramCounter() + ((int64_t) instruction.simm19 * 4); 
+            memAddressToAccess = getProgramCounter() + (instruction.simm19 * 4); 
 
             // as this is always a load, we will store the data in here into the register
             load(memAddressToAccess, instruction.rt, width);

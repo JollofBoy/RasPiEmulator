@@ -66,7 +66,6 @@ static void cUpdatePC(int64_t simmVal, uint8_t condition) {
 
 // unconditionally updates the Program Counter with a register
 static void rUpdatePC(uint64_t reg) {
-    // might have to look at this more carefully for debugging TODO
     int64_t diffBtwnPCAndReg = readXn(reg) - getProgramCounter();
     incrementProgramCounter(diffBtwnPCAndReg);
 }

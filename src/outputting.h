@@ -1,1 +1,3 @@
-extern void output(char*);
+#include <stdbool.h>
+
+extern bool output(char*);
