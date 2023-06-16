@@ -6,6 +6,9 @@
 // made headers
 #include "decode.h"
 
+// for testing
+#include "utils.h"
+
 // macro for outputting the struct
 #define getName(var)  #var
 
@@ -20,14 +23,15 @@ instruction_t instruction;
 
 // these extend the corresponding simm numbers to the correct number
 static int64_t signExtend9(int64_t num) {
-    if (signBitOf(num, 9) == 1) { /*the sign bit on*/
+    if (num > 255) { /*if the positive number is greater than 255, then make it negative*/
         return NINE_SIGN_EXTENSION_MASK | num; 
     }
     return num;
 }
 
 static int64_t signExtend19(int64_t num) {
-    if (signBitOf(num, 19) == 1) { /*the sign bit on*/
+    if (signBitOf(num, 18) == 1) { /*TODO there is a weird bug here cos I think it should work for 
+                                          19, but it doesn't. The mask had to be changed as well*/
         return NINETEEN_SIGN_EXTENSION_MASK | num; 
     }
     return num;
@@ -104,10 +108,10 @@ static void loadB(uint32_t instr) {
 // this is the identifier value to see what group the instruction goes under
 static uint8_t op0; 
 
-group_t decodeInstruction(uint32_t instruction) {
+group_t decodeInstruction(uint32_t instr) {
     group_t group;
     // we set the op0 to its value
-    op0 = OP0_MASK & (instruction >> OP0_SHIFT);
+    op0 = OP0_MASK & (instr >> OP0_SHIFT);
 
     // finds what the group of the instruction is based on the op0 and then 
     // loads values to the relevant markers
@@ -116,14 +120,14 @@ group_t decodeInstruction(uint32_t instruction) {
         case 0x9:
             group = DP_IMMEDIATE;
             printf("DP IMMEDIATE\n");
-            loadDPI(instruction); // this sets the structs to every possible value 
+            loadDPI(instr); // this sets the structs to every possible value 
                                        // in the case of DP_IMMEDIATE
             break;
         case 0x5:
         case 0xd:
             group = DP_REGISTER;
             printf("DP REGISTER\n");
-            loadDPR(instruction); // this sets the structs to every possible value
+            loadDPR(instr); // this sets the structs to every possible value
                                        // in the case of DP_REGISTER
             break;
         case 0x4:
@@ -132,23 +136,24 @@ group_t decodeInstruction(uint32_t instruction) {
         case 0xe:
             group = LOADS_AND_STORES;
             printf("LOADS AND STORES\n");
-            loadLAS(instruction); // this sets the structs to every possible value
+            loadLAS(instr); // this sets the structs to every possible value
                                        // in the case of LOADS_AND_STORES
             break;
         case 0xa:
         case 0xb:
             group = BRANCHES;
             printf("BRANCHES\n");
-            loadB(instruction); // this sets the structs to every possible value in 
+            loadB(instr); // this sets the structs to every possible value in 
                                      // the case of BRANCHES
             break;
-        default:
+        default: /*for debugging for branches and missed fetches*/
             printf("NO MATCH. op0 = %d\n", op0);
     }
 
     return group;
 }
 
+// prints out the contents of the broken down instruction for debugging purposes
 void printInstructStructContents(void) {
     printf("%s = %d\n", getName(sf), instruction.sf);
     printf("%s = %d\n", getName(opc), instruction.opc);
@@ -188,7 +193,7 @@ void printInstructStructContents(void) {
     printf("opr.%s = %d\n", getName(val), instruction.opr.val);
 }
 
-// returns a mask ofo the correct bitWidth
+// returns a mask of the correct bitWidth
 uint64_t activeMask(uint8_t bitWidth) {
     return (bitWidth == 32) ? THIRTYTWO_BIT_MASK : SIXTYFOUR_BIT_MASK;
 }

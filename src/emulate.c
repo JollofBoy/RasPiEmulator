@@ -59,7 +59,6 @@ void run(void) {
         // DECODE and EXECUTE the special instructions
         if (fetchedInstruction == HALT_INSTRUCTION) {
             running = false;
-            break;
         } else if (fetchedInstruction == NO_OP_INSTRUCTION) {
             // EXECUTE the no operation instruction 
             // (-1 would mean to skip in the executeInstruction function)

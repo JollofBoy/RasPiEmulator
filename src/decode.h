@@ -17,7 +17,7 @@
 
 // definitions to sign extend the simm values to 64bits
 #define NINE_SIGN_EXTENSION_MASK 0xfffffffffffffe00
-#define NINETEEN_SIGN_EXTENSION_MASK 0xfffffffffff80000
+#define NINETEEN_SIGN_EXTENSION_MASK 0xfffffffffffc0000
 #define TWENTYSIX_SIGN_EXTENSION_MASK 0xfffffffffc000000
 
 // definition for the minimum unsigned number

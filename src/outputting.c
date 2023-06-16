@@ -39,11 +39,14 @@ static void outputNonZeroMemory(void) {
     }
 }
 
-void output(char *outputFile) {
+bool output(char *outputFile) {
     if (outputFile[0] == 'p') { // if 'p' is parsed, then the pointer points to stdout
         fptr = stdout;
     } else { // otherwise opens the file in write mode
         fptr = fopen(outputFile, "w");
+        if (fptr == NULL) {
+            return false;
+        }
     }
 
     outputGeneralRegisters();
@@ -53,4 +56,7 @@ void output(char *outputFile) {
     
     // closes the file
     fclose(fptr);
+
+    // just to show that the outputting was successful
+    return true;
 }
