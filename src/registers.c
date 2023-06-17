@@ -15,9 +15,19 @@ static uint64_t generalRegisters[GENERAL_REG_NUM];
 static pstate_t pstate = {.negativeFlag = false, .zeroFlag = true, 
     .carryFlag = false, .overflowFlag = false};
 
+// is true if any pstate flag has changed
+static bool changed = false;
+
 // special registers
 static uint64_t zeroRegister;
 static int64_t programCounter;
+
+// detects if a flag change has occurs
+static void flagChanged(bool ogFlag, bool newVal) {
+    if (ogFlag != newVal) {
+        changed = true;
+    }
+}
 
 // 64-bit mode manipulations
 uint64_t readXn(int n) {
@@ -76,20 +86,24 @@ void incrementProgramCounter(int64_t n) {
     programCounter += n;
 }
 
-// sets the boolean value of the flag
+// sets the boolean value of the flag and tells returns true or false
 void setN(bool value) {
+    flagChanged(pstate.negativeFlag, value);
     pstate.negativeFlag = value;
 }
 
 void setZ(bool value) {
+    flagChanged(pstate.zeroFlag, value);
     pstate.zeroFlag = value;
 }
 
 void setC(bool value) {
+    flagChanged(pstate.carryFlag, value);
     pstate.carryFlag = value;
 }
 
 void setV(bool value) {
+    flagChanged(pstate.overflowFlag, value);
     pstate.overflowFlag = value;
 }
 
@@ -107,4 +121,12 @@ bool getC(void) {
 
 bool getV(void) {
     return pstate.overflowFlag;
+}
+
+void resetChanged(void) {
+    changed = false;
+}
+
+bool getChanged(void) {
+    return changed;
 }

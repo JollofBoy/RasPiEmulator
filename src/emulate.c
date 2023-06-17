@@ -22,10 +22,10 @@ int main(int argc, char **argv) {
   
     // these are too many inputs or too little inputs
     if (argc < 2) {
-        fprintf(stderr, "Usage: too little inputs. Give 2\n");
+        fprintf(stderr, "Usage: too few inputs, write at least ./emulate <bin file>\n");
         exit(1);
     } else if (argc > 3) {
-        fprintf(stderr, "Usage: too many inputs. Give 2\n");
+        fprintf(stderr, "Usage: too many inputs, write ./emulate <bin file> <out file>\n");
         exit(1);
     }
 

@@ -26,18 +26,12 @@ static uint64_t makeMaskToClearBits(uint8_t bitWidth, uint8_t shiftVal) {
 static void move(uint8_t opcode, uint64_t op, uint8_t dest, uint8_t bitWidth, uint8_t shiftVal) {
     switch (opcode) {
         case 0x0: /*movn*/
-            //TODO
-            printf("movn");
             writeToRegister(~op, dest, bitWidth);
             break;
         case 0x2: /*movz*/
-            //TODO
-            printf("movz");
             writeToRegister(op, dest, bitWidth);
             break;
         case 0x3: ; /*movk*/
-            //TODO
-            printf("movk");
             // I need to understand how this works properly
             uint64_t valueToParse = readXn(dest);
             // has to be the shifted value + 1 so that the 
@@ -47,7 +41,6 @@ static void move(uint8_t opcode, uint64_t op, uint8_t dest, uint8_t bitWidth, ui
             valueToParse = (valueToParse & maskToClearBitsInRange) | op;
 
             // WARNING: parsing the value here means that the top 32 bits will be wiped if sf is 0
-            // TODO might need to make this readXn ???
             writeToRegister(valueToParse, dest, bitWidth);
             break;
     }
@@ -71,7 +64,12 @@ void executeDPI(void) {
             uint64_t arithResult = arithOpOn(workingOperand, workingImm12, 
                     instruction.opc, width);
 
-            writeToRegister(arithResult, instruction.rd, width);
+            if (!(instruction.rd == 0xf && getChanged())) { /*rd is 1111 and the flags change*/
+                writeToRegister(arithResult, instruction.rd, width);
+                resetChanged();
+            } else {
+               resetChanged();
+            } 
             break;
         case 0x5: ; /*Wide Move*/
             uint8_t shift16 = instruction.operand.hw * 16;
@@ -120,8 +118,6 @@ uint64_t arithOpOn(uint64_t operand1, uint64_t operand2, uint8_t opcode, uint8_t
             result = (operand1 - operand2) & activeMask(bitWidth);
             break;
         case 0x3: /*subs*/
-            //TODO
-            printf("subs");
             result = (operand1 - operand2) & activeMask(bitWidth);
 
             uint8_t borrowBit = (operand1 < MIN + operand2) ? 1 : 0;
