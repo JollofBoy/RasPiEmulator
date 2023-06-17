@@ -1,12 +1,14 @@
 #include <stdbool.h>
 #include <stdint.h>
-
 #define GENERAL_REG_NUM 31
 #define THIRTYTWO_BIT_MASK 0x00000000ffffffff
 #define SIXTYFOUR_BIT_MASK 0xffffffffffffffff
 
 // this is to increment the pc to the next instruction if there is no branch
 #define NEXT_INSTRUCTION 4
+
+// this is the code that some specific registers have to be to encode the zero register
+#define ZERO_REG_CODE 0xf
 
 // This contains the types of registers
 typedef struct {
@@ -52,3 +54,8 @@ extern bool getZ(void);
 extern bool getC(void);
 extern bool getV(void);
 
+// resets the changed variable to false
+extern void resetChanged(void);
+
+// returns the value of the changed variable
+extern bool getChanged(void);

@@ -24,8 +24,6 @@ static uint64_t getMemAddressToAccess(uint64_t baseRegister, uint8_t unsignedOff
         memoryAddressToAccess = readXn(baseRegister) + xmVal; 
 
     } else if (IVal == 1) { /*Pre-Indexed*/
-        //TODO
-        printf("Pre-Indexed");
         // memory address is the value of the base register + simm9
         // this replaces the Xn value
         memoryAddressToAccess = readXn(baseRegister) + simm9Val;

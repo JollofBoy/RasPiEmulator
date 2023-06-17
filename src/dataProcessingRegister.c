@@ -123,14 +123,27 @@ void executeDPR(void) {
         uint64_t arithResult = arithOpOn(rnValue, shiftedRmVal, instruction.opc, width);
 
         // writes the result of the arithmetic operation to rd
-        writeToRegister(arithResult, instruction.rd, width);
+        // if rd, rn or rm is 1111 then we encode the zero register
+        if (!(instruction.rd == ZERO_REG_CODE && getChanged())) {
+            writeToRegister(arithResult, instruction.rd, width);
+            resetChanged();
+        } else {
+            resetChanged();
+        }
+
         
     } else if (instruction.M == 0 && instruction.opr.msb == 0) { /*Bit-Logic*/
         uint64_t logicResult = logicOpOn(rnValue, shiftedRmVal, instruction.opc,
                 instruction.opr.N, width);
 
         // writes the result of the logic operation to rd
-        writeToRegister(logicResult, instruction.rd, width);
+        // if rd, rn or rm is 1111 then we encode the zero register
+        if (!(instruction.rd == ZERO_REG_CODE && getChanged())) {
+            writeToRegister(logicResult, instruction.rd, width);
+            resetChanged();
+        } else {
+            resetChanged();
+        }
 
     } else { /*Multiply*/
         // finds the result of applying a multiplication of some sort
@@ -138,6 +151,13 @@ void executeDPR(void) {
         uint64_t multResult = multOpOn(raValue, rnValue, rmValue, instruction.operand.x);
 
         // writes the result of the multiplication operation to rd
-        writeToRegister(multResult, instruction.rd, width);
+        // if rd, rn or rm is 1111 then we encode the zero register
+        if (!(instruction.operand.ra == ZERO_REG_CODE && getChanged())) {
+            writeToRegister(multResult, instruction.rd, width);
+            resetChanged();
+        } else {
+            resetChanged();
+        }
+
     }
 }
