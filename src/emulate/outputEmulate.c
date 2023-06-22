@@ -3,7 +3,7 @@
 #include <stdbool.h>
 
 // made headers
-#include "outputting.h"
+#include "outputEmulate.h"
 #include "memory.h"
 #include "registers.h"
 

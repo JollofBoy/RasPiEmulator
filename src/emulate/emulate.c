@@ -11,7 +11,7 @@
 #include "fetch.h"
 #include "decode.h"
 #include "execute.h"
-#include "outputting.h"
+#include "outputEmulate.h"
 #include "utils.h"
 
 // private definitions
