@@ -36,7 +36,7 @@ static bst makeNode(char *key, uint64_t value) {
 // according to the key's value
 static bst addNode(bst rootNode, char *key, uint64_t value) {
     if (rootNode == NULL) { /*the node is empty*/
-        return makenode(key,value);
+        return makeNode(key,value);
     }
     
     int cmp = strcmp(key, rootNode->key); 
@@ -70,13 +70,14 @@ static bool lookupHelper(bst rootNode, char *key, uint64_t *val) {
     }
 }
 
-
 // Public functions
 
 void addToBst(char *key, uint64_t value) {
     symbolTable = addNode(symbolTable, key, value);
 }
 
+// returns true if the key is in the symbol table and changes the value parsed into the value
+// associated with the key
 bool lookup(char *key, uint64_t *val) {
     return lookupHelper(symbolTable, key, val);
 } 
@@ -90,4 +91,4 @@ void freeBst(bst rootNode) {
         freeBst(rootNode->right);
         free(rootNode);
     }
-   }
+}
